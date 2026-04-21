@@ -212,8 +212,8 @@
                         <p class="text-on-surface-variant text-xs italic leading-relaxed">A spacious suite opening
                             directly to the private moss garden. Experience the earth under your feet.</p>
                     </div>
-                    <button
-                        class="text-primary font-bold text-xs uppercase tracking-widest border-b-2 border-primary-container pb-1">상세
+                    <button id="btn-details-1f"
+                        class="text-primary font-bold text-xs uppercase tracking-widest border-b-2 border-primary-container pb-1 transition-colors hover:text-emerald-700">상세
                         보기 / View Details</button>
                 </div>
             </div>
@@ -244,8 +244,8 @@
                         <p class="text-on-surface-variant text-xs italic leading-relaxed">Designed for sunset lovers.
                             High ceilings and expansive windows that frame the Yeongjong horizon.</p>
                     </div>
-                    <button
-                        class="text-primary font-bold text-xs uppercase tracking-widest border-b-2 border-primary-container pb-1">상세
+                    <button id="btn-details-2f"
+                        class="text-primary font-bold text-xs uppercase tracking-widest border-b-2 border-primary-container pb-1 transition-colors hover:text-emerald-700">상세
                         보기 / View Details</button>
                 </div>
             </div>
@@ -435,6 +435,23 @@
         </div>
     </footer>
 
+    <!-- Lightbox Modal -->
+    <div id="gallery-modal"
+        class="fixed inset-0 z-[100] bg-stone-950/95 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col pt-20 px-6 pb-6">
+        <button id="close-gallery"
+            class="absolute top-6 right-6 text-white bg-white/20 hover:bg-white/40 p-2 rounded-full transition-colors w-12 h-12 flex items-center justify-center">
+            <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+        <div class="text-center mb-6">
+            <h3 id="gallery-title" class="text-2xl font-serif text-white mb-2"></h3>
+            <p id="gallery-subtitle" class="text-white/60 text-xs tracking-widest uppercase"></p>
+        </div>
+        <div id="gallery-container"
+            class="flex-1 w-full max-w-5xl mx-auto overflow-y-auto no-scrollbar grid grid-cols-1 md:grid-cols-2 gap-4 pb-12 content-start">
+            <!-- Images injected via JS -->
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
@@ -452,6 +469,50 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const storage = getStorage(app);
+
+        // --- Gallery Lightbox Logic ---
+        const modal = document.getElementById('gallery-modal');
+        const galleryContainer = document.getElementById('gallery-container');
+        const closeBtn = document.getElementById('close-gallery');
+        const galleryTitle = document.getElementById('gallery-title');
+        const gallerySubtitle = document.getElementById('gallery-subtitle');
+
+        const roomsData = {
+            '1f': { title: '1층 가든 룸', subtitle: '1st Floor Garden Room', path: 'images/room1/details/' },
+            '2f': { title: '2층 스카이 뷰', subtitle: '2nd Floor Sky View', path: 'images/room2/details/' },
+        };
+
+        function openGallery(roomId) {
+            const data = roomsData[roomId];
+            galleryTitle.textContent = data.title;
+            gallerySubtitle.textContent = data.subtitle;
+            galleryContainer.innerHTML = '';
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            document.body.style.overflow = 'hidden';
+
+            for (let i = 1; i <= 30; i++) {
+                const img = new Image();
+                img.src = `${data.path}${i}.jpg`;
+                img.className = 'w-full h-auto rounded-xl object-cover ambient-shadow opacity-0 transition-opacity duration-500';
+
+                img.onload = () => {
+                    img.classList.remove('opacity-0');
+                    galleryContainer.appendChild(img);
+                };
+                img.onerror = () => {
+                    // Suppress
+                };
+            }
+        }
+
+        document.getElementById('btn-details-1f').addEventListener('click', () => openGallery('1f'));
+        document.getElementById('btn-details-2f').addEventListener('click', () => openGallery('2f'));
+
+        closeBtn.addEventListener('click', () => {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            document.body.style.overflow = '';
+        });
 
         // --- Guestbook Logic ---
         const form = document.getElementById('guestbook-form');
