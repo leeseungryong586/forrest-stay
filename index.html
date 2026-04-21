@@ -156,25 +156,27 @@
         <button class="material-symbols-outlined">menu</button>
     </header>
     <!-- Hero Section -->
-    <section class="relative h-screen w-full flex items-center justify-center overflow-hidden">
+    <section class="relative h-screen w-full flex items-start justify-center overflow-hidden pt-32 md:pt-40">
         <div class="absolute inset-0 bg-stone-200">
             <img src="images/background/bg.jpg" alt="FOR.REST Background" class="w-full h-full object-cover">
         </div>
-        <div class="relative z-10 text-center px-6">
-            <h1 class="text-6xl md:text-8xl text-primary font-serif mb-6 tracking-tighter leading-none">
+        <div
+            class="relative z-10 text-center px-8 py-10 bg-white/70 backdrop-blur-md rounded-3xl ambient-shadow max-w-2xl mx-6 border border-white/50">
+            <h1 class="text-6xl md:text-7xl text-primary font-serif mb-4 tracking-tighter leading-none">
                 포레스트 <span class="hero-bilingual-sub italic">FOR.REST</span>
             </h1>
-            <div class="max-w-xl mx-auto space-y-2">
-                <p class="text-on-surface-variant text-lg md:text-xl font-medium leading-relaxed">
+            <div class="max-w-xl mx-auto space-y-2 mt-6">
+                <p class="text-on-surface-variant text-lg md:text-xl font-bold leading-relaxed">
                     영종도에서의 고요한 쉼. 정원과 노을, 그리고 온전한 휴식이 있는 곳
                 </p>
-                <p class="text-on-surface-variant/70 text-sm md:text-base font-light italic leading-relaxed">
-                    A quiet pause in Yeongjong. A place of garden, sunset, and gentle rest.
+                <p
+                    class="text-on-surface-variant/80 text-xs md:text-sm font-medium italic leading-relaxed uppercase tracking-widest mt-2">
+                    A quiet pause in Yeongjong.<br>A place of garden, sunset, and gentle rest.
                 </p>
             </div>
-            <div class="mt-20 flex justify-center">
-                <span class="material-symbols-outlined text-primary text-4xl animate-bounce">expand_more</span>
-            </div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex justify-center">
+            <span class="material-symbols-outlined text-white drop-shadow-md text-5xl animate-bounce">expand_more</span>
         </div>
     </section>
     <!-- Our Rooms -->
@@ -399,8 +401,9 @@
             <span class="bilingual-sub uppercase tracking-widest text-on-surface-variant">Visit Us</span>
         </h2>
         <div class="space-y-4 mb-12">
-            <p class="text-on-surface-variant">인천광역시 중구 운서동 123-45<br />123-45 Unseo-dong, Jung-gu, Incheon</p>
-            <p class="text-on-surface-variant">+82 10 1234 5678</p>
+            <p class="text-on-surface-variant">인천광역시 중구 백운로안길 56 (우 22356, 운북동 767-53)<br />56, Baegun-ro an-gil,
+                Jung-gu, Incheon</p>
+            <p class="text-on-surface-variant">010-9082-1976</p>
         </div>
         <a class="inline-flex items-center gap-3 bg-[#FEE500] text-[#191919] px-8 py-4 rounded-xl font-bold hover:brightness-95 transition-all"
             href="http://pf.kakao.com/_xxxxxx/chat" target="_blank">

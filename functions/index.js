@@ -4,8 +4,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 admin.initializeApp();
 
-// TODO: Replace with the actual Gemini API key provided by the user
-const apiKey = "YOUR_GEMINI_API_KEY_HERE";
+const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
 exports.autoReplyGuestbook = onSchedule({
@@ -30,7 +29,7 @@ exports.autoReplyGuestbook = onSchedule({
 
     for (const doc of snapshot.docs) {
         const data = doc.data();
-        
+
         const prompt = `당신은 영종도의 자연 속 쉼터, 'FOR.REST STAY'의 다정하고 감성적인 호스트입니다.
 아래는 게스트가 두고 간 방명록 메시지입니다.
 
