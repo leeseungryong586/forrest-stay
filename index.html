@@ -422,11 +422,28 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCOhpwPu7LwJ6FcSg4ZcRMQkfOsXjSkHSo",
+            authDomain: "forrest-stay.firebaseapp.com",
+            projectId: "forrest-stay",
+            storageBucket: "forrest-stay.firebasestorage.app",
+            messagingSenderId: "998104536062",
+            appId: "1:998104536062:web:acf917e1f9382676f3a6af"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
         // --- Guestbook Logic ---
         const form = document.getElementById('guestbook-form');
         const list = document.getElementById('guestbook-list');
         const audioInput = document.getElementById('gb-audio');
+        const submitBtn = form.querySelector('button[type="submit"]');
 
         // File upload label update
         audioInput.addEventListener('change', (e) => {
@@ -437,63 +454,88 @@
             }
         });
 
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const name = document.getElementById('gb-name').value;
-            const message = document.getElementById('gb-message').value;
-            const audioFile = audioInput.files.length > 0 ? audioInput.files[0] : null;
-
-            if (audioFile) {
-                const audioUrl = URL.createObjectURL(audioFile);
-
-                // Create Audio Player
-                const audioHTML = `
+        // Load existing entries
+        const q = query(collection(db, "guestbook"), orderBy("createdAt", "desc"));
+        onSnapshot(q, (snapshot) => {
+            list.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                if (!data.createdAt) return; // Skip temporary rendering state
+                const audioHTML = data.audioUrl ? `
                 <div class="mt-4">
-                    <audio src="${audioUrl}" controls class="w-full h-10 outline-none rounded-full"></audio>
-                </div>
-            `;
+                    <audio src="${data.audioUrl}" controls class="w-full h-10 outline-none rounded-full"></audio>
+                </div>` : '';
 
-                const entryId = 'qr-' + Date.now();
+                const replyHTML = data.reply ? `
+                <div class="mt-6 bg-surface-container-low p-4 rounded-xl border-l-4 border-primary">
+                    <p class="text-[10px] font-bold text-primary mb-2 uppercase tracking-widest">FOR.REST STAY 호스트의 답글</p>
+                    <p class="text-xs text-on-surface-variant leading-relaxed">${data.reply}</p>
+                </div>` : '';
 
-                // Build Entry HTML matching user's Tailwind design
+                const dateStr = data.createdAt.toDate().toLocaleDateString();
+                const entryId = 'qr-' + doc.id;
+
                 const entryDiv = document.createElement('div');
                 entryDiv.className = 'bg-white p-6 rounded-xl border border-stone-100 shadow-sm transition-all hover:shadow-md';
                 entryDiv.innerHTML = `
                 <div class="flex justify-between items-start mb-4">
                     <div>
-                        <h4 class="font-bold text-primary">${name}</h4>
-                        <p class="text-[10px] text-outline uppercase tracking-wider">업로드 일자: ${new Date().toLocaleDateString()}</p>
+                        <h4 class="font-bold text-primary">${data.name}</h4>
+                        <p class="text-[10px] text-outline uppercase tracking-wider">업로드 일자: ${dateStr}</p>
                     </div>
                     <div class="w-16 h-16 bg-white p-1 border border-outline-variant rounded flex items-center justify-center">
                         <div id="${entryId}"></div>
                     </div>
                 </div>
-                <p class="text-on-surface text-sm leading-relaxed mb-4 whitespace-pre-line">${message}</p>
+                <p class="text-on-surface text-sm leading-relaxed mb-4 whitespace-pre-line">${data.message}</p>
                 ${audioHTML}
-            `;
+                ${replyHTML}
+                `;
+                list.appendChild(entryDiv);
 
-                // Insert to list
-                list.insertBefore(entryDiv, list.firstChild);
+                if (data.audioUrl) {
+                    new QRCode(document.getElementById(entryId), {
+                        text: data.audioUrl, width: 54, height: 54, colorDark: "#234c29", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L
+                    });
+                }
+            });
+        });
 
-                // Generate QR Code
-                new QRCode(document.getElementById(entryId), {
-                    text: audioUrl,
-                    width: 54,
-                    height: 54,
-                    colorDark: "#234c29",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.L
-                });
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const name = document.getElementById('gb-name').value;
+            const message = document.getElementById('gb-message').value;
+            const audioFile = audioInput.files.length > 0 ? audioInput.files[0] : null;
 
-                // Auto-play the audio (modern browsers may block if not user interacted, but submit is interaction)
-                const audioEl = entryDiv.querySelector('audio');
-                audioEl.play().catch(e => console.error(e));
+            if (audioFile) {
+                // UI Loading state
+                const originalBtnText = submitBtn.textContent;
+                submitBtn.textContent = "기록 업로드 중... / Uploading...";
+                submitBtn.disabled = true;
 
-                // Reset Form
-                form.reset();
-                form.querySelector('span:nth-of-type(2)').textContent = '음악 파일 혹은 음성 업로드 / Upload an audio file';
-                form.querySelector('span:nth-of-type(2)').classList.remove('text-primary', 'font-bold');
+                try {
+                    const storageRef = ref(storage, 'guestbook/' + Date.now() + '-' + audioFile.name);
+                    await uploadBytes(storageRef, audioFile);
+                    const audioUrl = await getDownloadURL(storageRef);
+
+                    await addDoc(collection(db, "guestbook"), {
+                        name: name,
+                        message: message,
+                        audioUrl: audioUrl,
+                        createdAt: serverTimestamp(),
+                        reply: null
+                    });
+
+                    form.reset();
+                    form.querySelector('span:nth-of-type(2)').textContent = '음악 파일 혹은 음성 업로드 / Upload an audio file';
+                    form.querySelector('span:nth-of-type(2)').classList.remove('text-primary', 'font-bold');
+                } catch (error) {
+                    console.error("Error adding document: ", error);
+                    alert("업로드 중 오류가 발생했습니다.");
+                } finally {
+                    submitBtn.textContent = originalBtnText;
+                    submitBtn.disabled = false;
+                }
             }
         });
 

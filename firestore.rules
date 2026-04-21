@@ -1,0 +1,10 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Anyone can read and write guestbook entries for testing/simplicity
+    match /guestbook/{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
