@@ -365,10 +365,21 @@
                             placeholder="이곳에서의 순간을 나누어 주세요... / Share your moment..." rows="3" required></textarea>
                     </div>
                     <label
+                        class="cursor-pointer flex items-center gap-4 bg-surface-container-low p-4 rounded-xl hover:bg-surface-dim transition-colors mb-2">
+                        <span class="material-symbols-outlined text-primary">add_photo_alternate</span>
+                        <div class="flex flex-col">
+                            <span class="text-xs text-on-surface-variant font-bold text-gray-800">추억 사진 업로드 (최대 2장) /
+                                Upload photos</span>
+                            <span class="text-[10px] text-on-surface-variant mt-1 opacity-80">※ 용량 제한: 각 사진당 1MB
+                                이하</span>
+                        </div>
+                        <input id="gb-photos" type="file" accept="image/*" multiple class="hidden">
+                    </label>
+                    <label
                         class="cursor-pointer flex items-center gap-4 bg-surface-container-low p-4 rounded-xl hover:bg-surface-dim transition-colors">
                         <span class="material-symbols-outlined text-primary">audio_file</span>
                         <span class="text-xs text-on-surface-variant">음악 파일 혹은 음성 업로드 / Upload an audio file</span>
-                        <input id="gb-audio" type="file" accept="audio/*" class="hidden" required>
+                        <input id="gb-audio" type="file" accept="audio/*" class="hidden">
                     </label>
                     <button type="submit"
                         class="w-full bg-primary text-on-primary py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-on-primary-container transition-colors">추억
@@ -442,6 +453,7 @@
         // --- Guestbook Logic ---
         const form = document.getElementById('guestbook-form');
         const list = document.getElementById('guestbook-list');
+        const photoInput = document.getElementById('gb-photos');
         const audioInput = document.getElementById('gb-audio');
         const submitBtn = form.querySelector('button[type="submit"]');
 
@@ -451,6 +463,37 @@
             if (e.target.files.length > 0) {
                 label.textContent = e.target.files[0].name;
                 label.classList.add('text-primary', 'font-bold');
+            }
+        });
+
+        photoInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            const label = e.target.parentElement.querySelector('span.font-bold');
+
+            if (files.length > 2) {
+                alert("사진은 최대 2장까지만 등록 가능합니다.");
+                e.target.value = "";
+                label.textContent = "추억 사진 업로드 (최대 2장) / Upload photos";
+                label.classList.remove('text-primary');
+                return;
+            }
+
+            for (let i = 0; i < files.length; i++) {
+                if (files[i].size > 1024 * 1024) { // 1MB
+                    alert("사진의 용량은 한 장당 1MB 이하여야 합니다: " + files[i].name);
+                    e.target.value = "";
+                    label.textContent = "추억 사진 업로드 (최대 2장) / Upload photos";
+                    label.classList.remove('text-primary');
+                    return;
+                }
+            }
+
+            if (files.length > 0) {
+                label.textContent = files.length + "장의 사진 선택됨";
+                label.classList.add('text-primary');
+            } else {
+                label.textContent = "추억 사진 업로드 (최대 2장) / Upload photos";
+                label.classList.remove('text-primary');
             }
         });
 
@@ -488,6 +531,7 @@
                     </div>
                 </div>
                 <p class="text-on-surface text-sm leading-relaxed mb-4 whitespace-pre-line">${data.message}</p>
+                ${data.photoUrls && data.photoUrls.length > 0 ? `<div class="grid grid-cols-2 gap-4 my-4">${data.photoUrls.map(url => `<img src="${url}" class="w-full aspect-square rounded-xl object-cover border border-stone-100">`).join('')}</div>` : ''}
                 ${audioHTML}
                 ${replyHTML}
                 `;
@@ -506,29 +550,43 @@
             const name = document.getElementById('gb-name').value;
             const message = document.getElementById('gb-message').value;
             const audioFile = audioInput.files.length > 0 ? audioInput.files[0] : null;
+            const photoFiles = photoInput.files;
 
-            if (audioFile) {
+            if (audioFile || photoFiles.length > 0) {
                 // UI Loading state
                 const originalBtnText = submitBtn.textContent;
                 submitBtn.textContent = "기록 업로드 중... / Uploading...";
                 submitBtn.disabled = true;
 
                 try {
-                    const storageRef = ref(storage, 'guestbook/' + Date.now() + '-' + audioFile.name);
-                    await uploadBytes(storageRef, audioFile);
-                    const audioUrl = await getDownloadURL(storageRef);
+                    let audioUrl = null;
+                    if (audioFile) {
+                        const storageRef = ref(storage, 'guestbook/' + Date.now() + '-' + audioFile.name);
+                        await uploadBytes(storageRef, audioFile);
+                        audioUrl = await getDownloadURL(storageRef);
+                    }
+
+                    const photoUrls = [];
+                    for (let i = 0; i < photoFiles.length; i++) {
+                        const pRef = ref(storage, 'guestbook/photos/' + Date.now() + '-' + photoFiles[i].name);
+                        await uploadBytes(pRef, photoFiles[i]);
+                        photoUrls.push(await getDownloadURL(pRef));
+                    }
 
                     await addDoc(collection(db, "guestbook"), {
                         name: name,
                         message: message,
                         audioUrl: audioUrl,
+                        photoUrls: photoUrls,
                         createdAt: serverTimestamp(),
                         reply: null
                     });
 
                     form.reset();
-                    form.querySelector('span:nth-of-type(2)').textContent = '음악 파일 혹은 음성 업로드 / Upload an audio file';
-                    form.querySelector('span:nth-of-type(2)').classList.remove('text-primary', 'font-bold');
+                    form.querySelector('#gb-audio').parentElement.querySelector('span:nth-of-type(2)').textContent = '음악 파일 혹은 음성 업로드 / Upload an audio file';
+                    form.querySelector('#gb-audio').parentElement.querySelector('span:nth-of-type(2)').classList.remove('text-primary', 'font-bold');
+                    form.querySelector('#gb-photos').parentElement.querySelector('span.font-bold').textContent = '추억 사진 업로드 (최대 2장) / Upload photos';
+                    form.querySelector('#gb-photos').parentElement.querySelector('span.font-bold').classList.remove('text-primary');
                 } catch (error) {
                     console.error("Error adding document: ", error);
                     alert("업로드 중 오류가 발생했습니다.");
