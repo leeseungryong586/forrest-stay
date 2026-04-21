@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&amp;family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#bfefbe",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c2c9be",
+                        "on-tertiary-fixed": "#002107",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#e4e4cc",
+                        "on-secondary-fixed-variant": "#693b1c",
+                        "primary": "#3e6842",
+                        "inverse-primary": "#a4d2a4",
+                        "on-primary-container": "#234c29",
+                        "surface-container": "#f1f1e6",
+                        "surface": "#fcfcf7",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f7f7f0",
+                        "secondary-fixed-dim": "#fbb88f",
+                        "secondary-container": "#feba92",
+                        "on-secondary-container": "#794828",
+                        "surface-variant": "#e4e4cc",
+                        "on-background": "#1b1d0e",
+                        "on-tertiary-container": "#254c29",
+                        "primary-container": "#8fbc8f",
+                        "on-secondary-fixed": "#321300",
+                        "on-surface": "#1b1d0e",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#274f2c",
+                        "tertiary-container": "#91bc90",
+                        "secondary-fixed": "#ffdbc8",
+                        "surface-container-high": "#ebebe3",
+                        "secondary": "#855231",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#002107",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#406742",
+                        "surface-dim": "#dbdcc3",
+                        "inverse-surface": "#303221",
+                        "inverse-on-surface": "#f2f2d9",
+                        "primary-fixed-dim": "#a4d2a4",
+                        "outline": "#727970",
+                        "tertiary-fixed": "#c1eebf",
+                        "surface-tint": "#3e6842",
+                        "background": "#fcfcf7",
+                        "surface-bright": "#fcfcf7",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed-variant": "#284f2c",
+                        "on-surface-variant": "#424940",
+                        "tertiary-fixed-dim": "#a6d2a4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif KR", "Noto Serif", "serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #fcfcf7;
+            color: #1b1d0e;
+        }
+
+        h1,
+        h2,
+        h3,
+        .serif {
+            font-family: 'Noto Serif KR', 'Noto Serif', serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .ambient-shadow {
+            box-shadow: 0px 12px 32px -8px rgba(27, 29, 14, 0.05);
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .image-placeholder {
+            background-color: #f0f0e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-placeholder::after {
+            content: 'IMAGE';
+            font-family: 'Manrope', sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            color: #a2a99e;
+        }
+
+        .bilingual-sub {
+            font-size: 0.45em;
+            display: block;
+            margin-top: 0.25rem;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.05em;
+        }
+
+        .hero-bilingual-sub {
+            font-size: 0.35em;
+            display: block;
+            margin-top: 0.5rem;
+            letter-spacing: 0.1em;
+        }
+
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-surface selection:bg-primary-container selection:text-on-primary-container">
+    <!-- TopAppBar -->
+    <header
+        class="bg-white/70 backdrop-blur-xl text-emerald-900 font-serif tracking-widest uppercase fixed top-0 w-full z-50 flex justify-between items-center px-6 md:px-12 py-5 border-b border-stone-100">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined">spa</span>
+            <span class="text-2xl font-serif italic text-emerald-900">FOR.REST STAY</span>
+        </div>
+        <button class="material-symbols-outlined">menu</button>
+    </header>
+    <!-- Hero Section -->
+    <section class="relative h-screen w-full flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-stone-200 image-placeholder">
+            <!-- Hero Image Placeholder -->
+        </div>
+        <div class="relative z-10 text-center px-6">
+            <h1 class="text-6xl md:text-8xl text-primary font-serif mb-6 tracking-tighter leading-none">
+                포레스트 <span class="hero-bilingual-sub italic">FOR.REST</span>
+            </h1>
+            <div class="max-w-xl mx-auto space-y-2">
+                <p class="text-on-surface-variant text-lg md:text-xl font-medium leading-relaxed">
+                    영종도에서의 고요한 쉼. 정원과 노을, 그리고 온전한 휴식이 있는 곳
+                </p>
+                <p class="text-on-surface-variant/70 text-sm md:text-base font-light italic leading-relaxed">
+                    A quiet pause in Yeongjong. A place of garden, sunset, and gentle rest.
+                </p>
+            </div>
+            <div class="mt-20 flex justify-center">
+                <span class="material-symbols-outlined text-primary text-4xl animate-bounce">expand_more</span>
+            </div>
+        </div>
+    </section>
+    <!-- Our Rooms -->
+    <section class="py-24 px-6 max-w-5xl mx-auto" id="rooms">
+        <div class="mb-12 text-center">
+            <p class="text-primary font-bold tracking-widest uppercase text-xs mb-2">안식처 / Sanctuary</p>
+            <h2 class="text-4xl text-on-surface leading-tight">
+                객실 안내
+                <span class="bilingual-sub uppercase tracking-widest">Our Rooms</span>
+            </h2>
+        </div>
+        <div class="grid grid-cols-1 gap-24">
+            <!-- Room 1 -->
+            <div class="group">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="aspect-[4/5] rounded-xl overflow-hidden image-placeholder"></div>
+                    <div class="aspect-[4/5] rounded-xl overflow-hidden image-placeholder"></div>
+                </div>
+                <div
+                    class="bg-surface p-8 ambient-shadow rounded-2xl relative z-10 mx-auto max-w-2xl border border-stone-100">
+                    <h3 class="text-2xl mb-4 text-primary leading-tight">
+                        1층 가든 룸
+                        <span class="bilingual-sub text-on-surface-variant italic normal-case">1st Floor Garden
+                            Room</span>
+                    </h3>
+                    <div class="space-y-4 mb-8">
+                        <p class="text-on-surface text-sm leading-relaxed">개별 이끼 정원으로 바로 연결되는 넓은 스위트룸입니다. 발끝에 닿는 대지의 기운을
+                            느껴보세요.</p>
+                        <p class="text-on-surface-variant text-xs italic leading-relaxed">A spacious suite opening
+                            directly to the private moss garden. Experience the earth under your feet.</p>
+                    </div>
+                    <button
+                        class="text-primary font-bold text-xs uppercase tracking-widest border-b-2 border-primary-container pb-1">상세
+                        보기 / View Details</button>
+                </div>
+            </div>
+            <!-- Room 2 -->
+            <div class="group">
+                <div class="grid grid-cols-3 gap-4 mb-6 h-[400px]">
+                    <div class="col-span-2 rounded-xl overflow-hidden image-placeholder"></div>
+                    <div class="flex flex-col gap-4">
+                        <div class="flex-1 rounded-xl overflow-hidden image-placeholder"></div>
+                        <div class="flex-1 rounded-xl overflow-hidden image-placeholder"></div>
+                    </div>
+                </div>
+                <div
+                    class="bg-surface p-8 ambient-shadow rounded-2xl relative z-10 mx-auto max-w-2xl border border-stone-100">
+                    <h3 class="text-2xl mb-4 text-primary leading-tight">
+                        2층 스카이 뷰
+                        <span class="bilingual-sub text-on-surface-variant italic normal-case">2nd Floor Sky View</span>
+                    </h3>
+                    <div class="space-y-4 mb-8">
+                        <p class="text-on-surface text-sm leading-relaxed">노을을 사랑하는 이들을 위해 설계되었습니다. 높은 층고와 영종도의 지평선을
+                            담아내는 탁 트인 창이 특징입니다.</p>
+                        <p class="text-on-surface-variant text-xs italic leading-relaxed">Designed for sunset lovers.
+                            High ceilings and expansive windows that frame the Yeongjong horizon.</p>
+                    </div>
+                    <button
+                        class="text-primary font-bold text-xs uppercase tracking-widest border-b-2 border-primary-container pb-1">상세
+                        보기 / View Details</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Garden Split Section -->
+    <section class="bg-surface-container-low flex flex-col md:flex-row min-h-[600px]" id="garden">
+        <div class="w-full md:w-1/2 h-[400px] md:h-auto image-placeholder">
+            <!-- Garden Image Placeholder -->
+        </div>
+        <div class="w-full md:w-1/2 flex items-center justify-center p-12 md:p-24">
+            <div class="max-w-md">
+                <h2 class="text-4xl text-primary mb-6 leading-tight">
+                    사색의 정원
+                    <span class="bilingual-sub italic text-primary/80 normal-case mt-2">The Garden of Quiet
+                        Thoughts</span>
+                </h2>
+                <div class="mb-8">
+                    <p class="text-on-surface-variant leading-relaxed text-lg italic mb-2">
+                        "자연과 함께 걷는 모든 걸음에서, 우리는 기대한 것보다 훨씬 더 많은 것을 얻습니다."
+                    </p>
+                    <p class="text-on-surface-variant/70 text-sm italic">
+                        "In every walk with nature, one receives far more than he seeks."
+                    </p>
+                </div>
+                <div class="space-y-4 mb-8">
+                    <p class="text-on-surface leading-relaxed">
+                        저희 정원은 단순한 풍경이 아닌, 큐레이팅된 '침묵'의 공간입니다. 영종도의 자생 식물들로 채워진 이곳은 아침의 명상과 저무는 해 아래에서의 산책을 위해 디자인되었습니다.
+                    </p>
+                    <p class="text-on-surface-variant text-sm leading-relaxed">
+                        Our garden is not just a landscape, but a curated silence. Featuring native flora of Yeongjong,
+                        it's designed for morning meditations and evening strolls under the setting sun.
+                    </p>
+                </div>
+                <div class="flex gap-4">
+                    <span class="material-symbols-outlined text-primary">grass</span>
+                    <span class="material-symbols-outlined text-primary">water_drop</span>
+                    <span class="material-symbols-outlined text-primary">wb_sunny</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Room Availability -->
+    <section class="py-24 px-6 bg-surface-container-lowest" id="availability">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl text-on-surface mb-4 leading-tight">
+                예약 현황
+                <span class="bilingual-sub uppercase tracking-widest">Room Availability</span>
+            </h2>
+            <div class="w-12 h-0.5 bg-primary-container mx-auto mt-4"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+            <!-- Calendar 1 -->
+            <div class="bg-white p-8 rounded-2xl border border-stone-100 shadow-sm">
+                <div class="flex justify-between items-center mb-6 px-2">
+                    <button id="prev-month-1f"
+                        class="material-symbols-outlined text-on-surface-variant hover:text-primary">chevron_left</button>
+                    <div class="text-center">
+                        <h3 id="month-year-1f" class="font-bold text-on-surface text-xs tracking-tight uppercase">1층 가든
+                            룸</h3>
+                        <p class="text-[9px] text-outline uppercase tracking-wider">1st Floor Room</p>
+                    </div>
+                    <button id="next-month-1f"
+                        class="material-symbols-outlined text-on-surface-variant hover:text-primary">chevron_right</button>
+                </div>
+                <div class="grid grid-cols-7 text-center text-[10px] font-bold text-outline mb-4">
+                    <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                </div>
+                <div id="calendar-days-1f" class="grid grid-cols-7 gap-y-4 text-center text-sm">
+                    <!-- JS Rendered -->
+                </div>
+            </div>
+            <!-- Calendar 2 -->
+            <div class="bg-white p-8 rounded-2xl border border-stone-100 shadow-sm">
+                <div class="flex justify-between items-center mb-6 px-2">
+                    <button id="prev-month-2f"
+                        class="material-symbols-outlined text-on-surface-variant hover:text-primary">chevron_left</button>
+                    <div class="text-center">
+                        <h3 id="month-year-2f" class="font-bold text-on-surface text-xs tracking-tight uppercase">2층 스카이
+                            뷰</h3>
+                        <p class="text-[9px] text-outline uppercase tracking-wider">2nd Floor Room</p>
+                    </div>
+                    <button id="next-month-2f"
+                        class="material-symbols-outlined text-on-surface-variant hover:text-primary">chevron_right</button>
+                </div>
+                <div class="grid grid-cols-7 text-center text-[10px] font-bold text-outline mb-4">
+                    <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                </div>
+                <div id="calendar-days-2f" class="grid grid-cols-7 gap-y-4 text-center text-sm">
+                    <!-- JS Rendered -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Guestbook -->
+    <section class="py-24 bg-surface px-6" id="guestbook">
+        <div class="max-w-2xl mx-auto">
+            <h2 class="text-3xl text-primary mb-12 text-center leading-tight">
+                방명록
+                <span class="bilingual-sub uppercase tracking-widest text-primary/80">Guestbook</span>
+            </h2>
+            <!-- Form -->
+            <div class="bg-white p-8 rounded-2xl ambient-shadow mb-16 border border-stone-100">
+                <form id="guestbook-form" class="space-y-6">
+                    <div class="relative">
+                        <label
+                            class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1 block">이름
+                            / Your Name</label>
+                        <input id="gb-name"
+                            class="w-full bg-stone-50 border-0 border-b-2 border-outline-variant focus:ring-0 focus:border-primary px-0 py-3 text-on-surface placeholder:text-outline"
+                            placeholder="머물다 가는 여행자 / Resting Traveler" type="text" required />
+                    </div>
+                    <div class="relative">
+                        <label
+                            class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1 block">내용
+                            / Message</label>
+                        <textarea id="gb-message"
+                            class="w-full bg-stone-50 border-0 border-b-2 border-outline-variant focus:ring-0 focus:border-primary px-0 py-3 text-on-surface placeholder:text-outline"
+                            placeholder="이곳에서의 순간을 나누어 주세요... / Share your moment..." rows="3" required></textarea>
+                    </div>
+                    <label
+                        class="cursor-pointer flex items-center gap-4 bg-surface-container-low p-4 rounded-xl hover:bg-surface-dim transition-colors">
+                        <span class="material-symbols-outlined text-primary">audio_file</span>
+                        <span class="text-xs text-on-surface-variant">음악 파일 혹은 음성 업로드 / Upload an audio file</span>
+                        <input id="gb-audio" type="file" accept="audio/*" class="hidden" required>
+                    </label>
+                    <button type="submit"
+                        class="w-full bg-primary text-on-primary py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-on-primary-container transition-colors">추억
+                        기록하기 / Post Memory</button>
+                </form>
+            </div>
+            <!-- Notes List -->
+            <div id="guestbook-list" class="space-y-8">
+                <!-- Entries injected here by JS -->
+            </div>
+        </div>
+    </section>
+    <!-- Contact -->
+    <section class="py-24 px-6 text-center" id="contact">
+        <h2 class="text-3xl text-on-surface mb-8 leading-tight">
+            찾아오시는 길
+            <span class="bilingual-sub uppercase tracking-widest text-on-surface-variant">Visit Us</span>
+        </h2>
+        <div class="space-y-4 mb-12">
+            <p class="text-on-surface-variant">인천광역시 중구 운서동 123-45<br />123-45 Unseo-dong, Jung-gu, Incheon</p>
+            <p class="text-on-surface-variant">+82 10 1234 5678</p>
+        </div>
+        <a class="inline-flex items-center gap-3 bg-[#FEE500] text-[#191919] px-8 py-4 rounded-xl font-bold hover:brightness-95 transition-all"
+            href="http://pf.kakao.com/_xxxxxx/chat" target="_blank">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+            카카오톡 문의 / KakaoTalk: forrest_stay
+        </a>
+    </section>
+    <!-- Footer -->
+    <footer class="bg-stone-50 border-t border-stone-200 w-full mt-24">
+        <div
+            class="max-w-7xl mx-auto px-6 md:px-12 py-20 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-12">
+            <div>
+                <span class="text-lg font-serif text-emerald-900 block mb-4">FOR.REST STAY</span>
+                <p class="text-stone-500 font-serif text-sm tracking-loose">© 2024 FOR.REST STAY. 평온을 위해 큐레이팅된 공간.</p>
+                <p class="text-stone-400 font-serif text-[10px] uppercase tracking-widest mt-1">Curated for peace.</p>
+            </div>
+            <nav class="flex flex-wrap justify-center gap-8 text-stone-500 font-serif text-sm tracking-loose">
+                <a class="hover:underline underline-offset-8 transition-all hover:text-emerald-900" href="#">객실 /
+                    Rooms</a>
+                <a class="hover:underline underline-offset-8 transition-all hover:text-emerald-900" href="#">정원 /
+                    Garden</a>
+                <a class="hover:underline underline-offset-8 transition-all hover:text-emerald-900" href="#">방명록 /
+                    Guestbook</a>
+                <a class="hover:underline underline-offset-8 transition-all hover:text-emerald-900" href="#">문의 /
+                    KakaoTalk</a>
+                <a class="hover:underline underline-offset-8 transition-all hover:text-emerald-900" href="#">위치 /
+                    Contact</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        // --- Guestbook Logic ---
+        const form = document.getElementById('guestbook-form');
+        const list = document.getElementById('guestbook-list');
+        const audioInput = document.getElementById('gb-audio');
+
+        // File upload label update
+        audioInput.addEventListener('change', (e) => {
+            const label = e.target.parentElement.querySelector('span:nth-of-type(2)');
+            if (e.target.files.length > 0) {
+                label.textContent = e.target.files[0].name;
+                label.classList.add('text-primary', 'font-bold');
+            }
+        });
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('gb-name').value;
+            const message = document.getElementById('gb-message').value;
+            const audioFile = audioInput.files.length > 0 ? audioInput.files[0] : null;
+
+            if (audioFile) {
+                const audioUrl = URL.createObjectURL(audioFile);
+
+                // Create Audio Player
+                const audioHTML = `
+                <div class="mt-4">
+                    <audio src="${audioUrl}" controls class="w-full h-10 outline-none rounded-full"></audio>
+                </div>
+            `;
+
+                const entryId = 'qr-' + Date.now();
+
+                // Build Entry HTML matching user's Tailwind design
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'bg-white p-6 rounded-xl border border-stone-100 shadow-sm transition-all hover:shadow-md';
+                entryDiv.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h4 class="font-bold text-primary">${name}</h4>
+                        <p class="text-[10px] text-outline uppercase tracking-wider">업로드 일자: ${new Date().toLocaleDateString()}</p>
+                    </div>
+                    <div class="w-16 h-16 bg-white p-1 border border-outline-variant rounded flex items-center justify-center">
+                        <div id="${entryId}"></div>
+                    </div>
+                </div>
+                <p class="text-on-surface text-sm leading-relaxed mb-4 whitespace-pre-line">${message}</p>
+                ${audioHTML}
+            `;
+
+                // Insert to list
+                list.insertBefore(entryDiv, list.firstChild);
+
+                // Generate QR Code
+                new QRCode(document.getElementById(entryId), {
+                    text: audioUrl,
+                    width: 54,
+                    height: 54,
+                    colorDark: "#234c29",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.L
+                });
+
+                // Auto-play the audio (modern browsers may block if not user interacted, but submit is interaction)
+                const audioEl = entryDiv.querySelector('audio');
+                audioEl.play().catch(e => console.error(e));
+
+                // Reset Form
+                form.reset();
+                form.querySelector('span:nth-of-type(2)').textContent = '음악 파일 혹은 음성 업로드 / Upload an audio file';
+                form.querySelector('span:nth-of-type(2)').classList.remove('text-primary', 'font-bold');
+            }
+        });
+
+        // --- Calendars & Airbnb Sync Logic ---
+        const airbnbIcalUrl1F = "";
+        const airbnbIcalUrl2F = "";
+
+        let bookedDates1F = ['2026-04-22', '2026-04-23', '2026-04-24'];
+        let bookedDates2F = ['2026-04-18', '2026-04-19', '2026-04-20'];
+
+        function setupCalendar(prefix, bookedDatesArray, roomName) {
+            const monthYearEl = document.getElementById(`month-year-${prefix}`);
+            const calendarDaysEl = document.getElementById(`calendar-days-${prefix}`);
+            const prevMonthBtn = document.getElementById(`prev-month-${prefix}`);
+            const nextMonthBtn = document.getElementById(`next-month-${prefix}`);
+
+            let currentDate = new Date();
+
+            function render() {
+                currentDate.setDate(1);
+                const month = currentDate.getMonth();
+                const year = currentDate.getFullYear();
+
+                const firstDayIndex = currentDate.getDay();
+                const lastDay = new Date(year, month + 1, 0).getDate();
+
+                monthYearEl.textContent = `${roomName} / ${year}년 ${month + 1}월`;
+
+                calendarDaysEl.innerHTML = '';
+
+                // Padding days
+                for (let i = 0; i < firstDayIndex; i++) {
+                    calendarDaysEl.innerHTML += `<span class="text-transparent">0</span>`; // invisible day
+                }
+
+                const today = new Date();
+                for (let i = 1; i <= lastDay; i++) {
+                    const mm = String(month + 1).padStart(2, '0');
+                    const dd = String(i).padStart(2, '0');
+                    const dateStr = `${year}-${mm}-${dd}`;
+
+                    let dayHTML = '';
+                    if (bookedDatesArray.includes(dateStr)) {
+                        dayHTML = `<span class="relative text-stone-300 pointer-events-none">${i}<div class="absolute inset-0 flex items-center justify-center text-stone-200">/</div></span>`;
+                    } else if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                        dayHTML = `<span class="bg-primary text-on-primary w-8 h-8 flex items-center justify-center rounded-full mx-auto shadow-sm cursor-pointer select-none">${i}</span>`;
+                    } else {
+                        dayHTML = `<span class="text-on-surface cursor-pointer hover:bg-surface-container-high rounded-full w-8 h-8 flex items-center justify-center mx-auto transition-colors select-none">${i}</span>`;
+                    }
+                    calendarDaysEl.innerHTML += dayHTML;
+                }
+            }
+
+            prevMonthBtn.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                render();
+            });
+
+            nextMonthBtn.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                render();
+            });
+
+            render();
+            return render;
+        }
+
+        const render1F = setupCalendar('1f', bookedDates1F, '1층 가든 룸');
+        const render2F = setupCalendar('2f', bookedDates2F, '2층 스카이 뷰');
+
+        async function fetchIcalData(url, targetBookedArray, reRenderCallback) {
+            if (!url) return;
+            try {
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                if (data.contents) {
+                    console.log("Fetched iCal, preparing to parse.");
+                }
+            } catch (e) {
+                console.error("Failed to fetch iCal data:", e);
+            }
+        }
+
+        fetchIcalData(airbnbIcalUrl1F, bookedDates1F, render1F);
+        fetchIcalData(airbnbIcalUrl2F, bookedDates2F, render2F);
+
+    </script>
+</body>
+
+</html>
