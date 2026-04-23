@@ -153,13 +153,26 @@
             <span class="material-symbols-outlined">spa</span>
             <span class="text-2xl font-serif italic text-emerald-900">FOR.REST STAY</span>
         </div>
-        <button class="material-symbols-outlined">menu</button>
     </header>
     <!-- Hero Section -->
     <section class="relative h-screen w-full flex items-start justify-center overflow-hidden pt-32 md:pt-40">
-        <div class="absolute inset-0 bg-stone-200">
-            <img src="images/background/bg.jpg" alt="FOR.REST Background" class="w-full h-full object-cover">
+
+        <!-- Hero Image Slider (최대 10장 추가 가능) -->
+        <div class="absolute inset-0 bg-stone-200" id="hero-slider">
+            <!-- 첫 번째 이미지 (대표 이미지) -->
+            <img src="images/background/bg.jpg" alt="FOR.REST Background 1"
+                class="hero-slide absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-100">
+            <!-- 두 번째 이미지 (파일명 변경 필요) -->
+            <img src="images/background/bg.jpg" alt="FOR.REST Background 2"
+                class="hero-slide absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0">
+            <!-- 세 번째 이미지 (파일명 변경 필요) -->
+            <img src="images/background/bg.jpg" alt="FOR.REST Background 3"
+                class="hero-slide absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0">
+            <!-- 이미지를 더 추가하려면 위 줄(img 태그)을 복사해서 이어서 붙여넣기 하세요 (최대 10장 권장) -->
+
+            <div class="absolute inset-0 bg-black/10"></div> <!-- 글자 가독성을 위한 어두운 오버레이 -->
         </div>
+
         <div
             class="relative z-10 text-center px-8 py-10 bg-white/70 backdrop-blur-md rounded-3xl ambient-shadow max-w-2xl mx-6 border border-white/50">
             <h1 class="text-6xl md:text-7xl text-primary font-serif mb-4 tracking-tighter leading-none">
@@ -175,8 +188,17 @@
                 </p>
             </div>
         </div>
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex justify-center">
-            <span class="material-symbols-outlined text-white drop-shadow-md text-5xl animate-bounce">expand_more</span>
+
+        <!-- Slider Dots Indicator -->
+        <div class="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex gap-2" id="hero-dots">
+            <!-- JavaScript 렌더링 -->
+        </div>
+
+        <!-- Scroll down arrow -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex justify-center cursor-pointer"
+            onclick="document.getElementById('rooms').scrollIntoView({behavior: 'smooth'})" title="객실 안내로 이동">
+            <span
+                class="material-symbols-outlined text-white drop-shadow-md text-5xl animate-bounce hover:text-white/80 transition-colors">expand_more</span>
         </div>
     </section>
     <!-- Our Rooms -->
@@ -343,10 +365,25 @@
     <!-- Guestbook -->
     <section class="py-24 bg-surface px-6" id="guestbook">
         <div class="max-w-2xl mx-auto">
-            <h2 class="text-3xl text-primary mb-12 text-center leading-tight">
+            <h2 class="text-3xl text-primary mb-8 text-center leading-tight">
                 방명록
                 <span class="bilingual-sub uppercase tracking-widest text-primary/80">Guestbook</span>
             </h2>
+
+            <!-- Host Notice -->
+            <div
+                class="bg-surface-container-low border border-outline-variant/60 p-6 rounded-2xl mb-8 flex gap-4 items-start">
+                <span class="material-symbols-outlined text-primary shrink-0"
+                    style="font-variation-settings: 'FILL' 1;">campaign</span>
+                <div>
+                    <h3 class="text-[10px] font-bold text-primary mb-1.5 tracking-widest uppercase">호스트 알림 / Host Notice
+                    </h3>
+                    <p class="text-sm text-on-surface-variant leading-relaxed break-keep">
+                        이번 주 방문하시는 분들께 웰컴 드링크로 특별한 칵테일 한 잔을 무료로 안내해 드립니다. 머무시는 동안 온전한 휴식을 누리시길 바랍니다.
+                    </p>
+                </div>
+            </div>
+
             <!-- Form -->
             <div class="bg-white p-8 rounded-2xl ambient-shadow mb-16 border border-stone-100">
                 <form id="guestbook-form" class="space-y-6">
@@ -469,6 +506,41 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const storage = getStorage(app);
+
+        // --- Hero Slider Logic ---
+        const slides = document.querySelectorAll('.hero-slide');
+        const dotsContainer = document.getElementById('hero-dots');
+        let currentSlide = 0;
+
+        if (slides.length > 0) {
+            // Create dots dynamically based on number of slides
+            slides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.className = `w-2 h-2 rounded-full cursor-pointer transition-all duration-300 ${index === 0 ? 'bg-white w-4' : 'bg-white/50'}`;
+                dot.addEventListener('click', () => goToSlide(index));
+                dotsContainer.appendChild(dot);
+            });
+            const dots = dotsContainer.querySelectorAll('div');
+
+            function goToSlide(index) {
+                slides[currentSlide].classList.remove('opacity-100');
+                slides[currentSlide].classList.add('opacity-0');
+                dots[currentSlide].classList.remove('bg-white', 'w-4');
+                dots[currentSlide].classList.add('bg-white/50');
+
+                currentSlide = index;
+
+                slides[currentSlide].classList.remove('opacity-0');
+                slides[currentSlide].classList.add('opacity-100');
+                dots[currentSlide].classList.remove('bg-white/50');
+                dots[currentSlide].classList.add('bg-white', 'w-4');
+            }
+
+            setInterval(() => {
+                let next = (currentSlide + 1) % slides.length;
+                goToSlide(next);
+            }, 5000);
+        }
 
         // --- Gallery Lightbox Logic ---
         const modal = document.getElementById('gallery-modal');
