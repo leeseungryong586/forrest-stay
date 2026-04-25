@@ -118,13 +118,13 @@
         .image-placeholder::after {
             content: 'IMAGE';
             font-family: 'Manrope', sans-serif;
-            font-size: 10px;
+            font-size: 12px;
             letter-spacing: 0.1em;
             color: #a2a99e;
         }
 
         .bilingual-sub {
-            font-size: 0.45em;
+            font-size: 0.55em;
             display: block;
             margin-top: 0.25rem;
             font-weight: 400;
@@ -133,7 +133,7 @@
         }
 
         .hero-bilingual-sub {
-            font-size: 0.35em;
+            font-size: 0.45em;
             display: block;
             margin-top: 0.5rem;
             letter-spacing: 0.1em;
@@ -328,12 +328,12 @@
                     <div class="text-center">
                         <h3 id="month-year-1f" class="font-bold text-on-surface text-xs tracking-tight uppercase">1층 가든
                             룸</h3>
-                        <p class="text-[9px] text-outline uppercase tracking-wider">1st Floor Room</p>
+                        <p class="text-[11px] md:text-[9px] text-outline uppercase tracking-wider">1st Floor Room</p>
                     </div>
                     <button id="next-month-1f"
                         class="material-symbols-outlined text-on-surface-variant hover:text-primary">chevron_right</button>
                 </div>
-                <div class="grid grid-cols-7 text-center text-[10px] font-bold text-outline mb-4">
+                <div class="grid grid-cols-7 text-center text-xs md:text-[10px] font-bold text-outline mb-4">
                     <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
                 </div>
                 <div id="calendar-days-1f" class="grid grid-cols-7 gap-y-4 text-center text-sm">
@@ -348,12 +348,12 @@
                     <div class="text-center">
                         <h3 id="month-year-2f" class="font-bold text-on-surface text-xs tracking-tight uppercase">2층 스카이
                             뷰</h3>
-                        <p class="text-[9px] text-outline uppercase tracking-wider">2nd Floor Room</p>
+                        <p class="text-[11px] md:text-[9px] text-outline uppercase tracking-wider">2nd Floor Room</p>
                     </div>
                     <button id="next-month-2f"
                         class="material-symbols-outlined text-on-surface-variant hover:text-primary">chevron_right</button>
                 </div>
-                <div class="grid grid-cols-7 text-center text-[10px] font-bold text-outline mb-4">
+                <div class="grid grid-cols-7 text-center text-xs md:text-[10px] font-bold text-outline mb-4">
                     <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
                 </div>
                 <div id="calendar-days-2f" class="grid grid-cols-7 gap-y-4 text-center text-sm">
@@ -376,7 +376,8 @@
                 <span class="material-symbols-outlined text-primary shrink-0"
                     style="font-variation-settings: 'FILL' 1;">campaign</span>
                 <div>
-                    <h3 class="text-[10px] font-bold text-primary mb-1.5 tracking-widest uppercase">호스트 알림 / Host Notice
+                    <h3 class="text-xs md:text-[10px] font-bold text-primary mb-1.5 tracking-widest uppercase">호스트 알림 /
+                        Host Notice
                     </h3>
                     <p class="text-sm text-on-surface-variant leading-relaxed break-keep">
                         이번 주 방문하시는 분들께 웰컴 드링크로 특별한 칵테일 한 잔을 무료로 안내해 드립니다. 머무시는 동안 온전한 휴식을 누리시길 바랍니다.
@@ -389,7 +390,7 @@
                 <form id="guestbook-form" class="space-y-6">
                     <div class="relative">
                         <label
-                            class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1 block">이름
+                            class="text-xs md:text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1 block">이름
                             / Your Name</label>
                         <input id="gb-name"
                             class="w-full bg-stone-50 border-0 border-b-2 border-outline-variant focus:ring-0 focus:border-primary px-0 py-3 text-on-surface placeholder:text-outline"
@@ -397,7 +398,7 @@
                     </div>
                     <div class="relative">
                         <label
-                            class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1 block">내용
+                            class="text-xs md:text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1 block">내용
                             / Message</label>
                         <textarea id="gb-message"
                             class="w-full bg-stone-50 border-0 border-b-2 border-outline-variant focus:ring-0 focus:border-primary px-0 py-3 text-on-surface placeholder:text-outline"
@@ -409,7 +410,8 @@
                         <div class="flex flex-col">
                             <span class="text-xs text-on-surface-variant font-bold text-gray-800">추억 사진 업로드 (최대 2장) /
                                 Upload photos</span>
-                            <span class="text-[10px] text-on-surface-variant mt-1 opacity-80">※ 용량 제한: 각 사진당 1MB
+                            <span class="text-xs md:text-[10px] text-on-surface-variant mt-1 opacity-80">※ 용량 제한: 각 사진당
+                                1MB
                                 이하</span>
                         </div>
                         <input id="gb-photos" type="file" accept="image/*" multiple class="hidden">
@@ -455,7 +457,8 @@
             <div>
                 <span class="text-lg font-serif text-emerald-900 block mb-4">FOR.REST STAY</span>
                 <p class="text-stone-500 font-serif text-sm tracking-loose">© 2024 FOR.REST STAY. 평온을 위해 큐레이팅된 공간.</p>
-                <p class="text-stone-400 font-serif text-[10px] uppercase tracking-widest mt-1">Curated for peace.</p>
+                <p class="text-stone-400 font-serif text-xs md:text-[10px] uppercase tracking-widest mt-1">Curated for
+                    peace.</p>
             </div>
             <nav class="flex flex-wrap justify-center gap-8 text-stone-500 font-serif text-sm tracking-loose">
                 <a class="hover:underline underline-offset-8 transition-all hover:text-emerald-900" href="#">객실 /
@@ -647,7 +650,7 @@
 
                 const replyHTML = data.reply ? `
                 <div class="mt-6 bg-surface-container-low p-4 rounded-xl border-l-4 border-primary">
-                    <p class="text-[10px] font-bold text-primary mb-2 uppercase tracking-widest">FOR.REST STAY 호스트의 답글</p>
+                    <p class="text-xs md:text-[10px] font-bold text-primary mb-2 uppercase tracking-widest">FOR.REST STAY 호스트의 답글</p>
                     <p class="text-xs text-on-surface-variant leading-relaxed">${data.reply}</p>
                 </div>` : '';
 
@@ -660,7 +663,7 @@
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <h4 class="font-bold text-primary">${data.name}</h4>
-                        <p class="text-[10px] text-outline uppercase tracking-wider">업로드 일자: ${dateStr}</p>
+                        <p class="text-xs md:text-[10px] text-outline uppercase tracking-wider">업로드 일자: ${dateStr}</p>
                     </div>
                     <div class="w-16 h-16 bg-white p-1 border border-outline-variant rounded flex items-center justify-center">
                         <div id="${entryId}"></div>
