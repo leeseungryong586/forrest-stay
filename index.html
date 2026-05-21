@@ -11,6 +11,7 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -422,6 +423,13 @@
                                 class="w-full bg-stone-50 border-0 border-b-2 border-outline-variant focus:ring-0 focus:border-primary px-0 py-3 text-on-surface placeholder:text-outline"
                                 placeholder="이곳에서의 순간을 나누어 주세요... / Share your moment..." rows="3" required></textarea>
                         </div>
+                        <div class="relative">
+                            <label
+                                class="text-xs md:text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1 block">수정/삭제 비밀번호 / Password</label>
+                            <input id="gb-password"
+                                class="w-full bg-stone-50 border-0 border-b-2 border-outline-variant focus:ring-0 focus:border-primary px-0 py-3 text-on-surface placeholder:text-outline"
+                                placeholder="비밀번호 4자리 / 4-digit password" type="password" required />
+                        </div>
                         <label
                             class="cursor-pointer flex items-center gap-4 bg-surface-container-low p-4 rounded-xl hover:bg-surface-dim transition-colors mb-2">
                             <span class="material-symbols-outlined text-primary">add_photo_alternate</span>
@@ -479,7 +487,7 @@
         <div
             class="max-w-7xl mx-auto px-6 md:px-12 py-20 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-12">
             <div>
-                <span class="text-lg font-serif text-emerald-900 block mb-4">FOR.REST STAY</span>
+                <span id="admin-trigger" class="text-lg font-serif text-emerald-900 block mb-4 cursor-pointer transition-colors hover:text-primary">FOR.REST STAY</span>
                 <p class="text-stone-500 font-serif text-sm tracking-loose">© 2024 FOR.REST STAY. 평온을 위해 큐레이팅된 공간.</p>
                 <p class="text-stone-400 font-serif text-xs md:text-[10px] uppercase tracking-widest mt-1">Curated for
                     peace.</p>
@@ -516,11 +524,55 @@
         </div>
     </div>
 
+    <!-- Modals -->
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="fixed inset-0 z-[100] bg-stone-950/80 opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-6">
+        <div class="bg-surface p-8 rounded-2xl max-w-sm w-full ambient-shadow">
+            <h3 class="text-2xl font-serif text-primary mb-4">관리자 접속</h3>
+            <form id="admin-login-form" class="space-y-4">
+                <input id="admin-password" type="password" placeholder="비밀번호" class="w-full bg-stone-50 border-0 border-b-2 border-outline-variant focus:ring-0 focus:border-primary px-0 py-3" required />
+                <div class="flex gap-4 mt-6">
+                    <button type="button" id="close-admin-modal" class="flex-1 py-3 text-sm font-bold text-outline hover:text-on-surface transition-colors">취소</button>
+                    <button type="submit" class="flex-1 bg-primary text-on-primary py-3 rounded-full font-bold text-sm">로그인</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Change Password Modal -->
+    <div id="admin-change-pwd-modal" class="fixed inset-0 z-[100] bg-stone-950/80 opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-6">
+        <div class="bg-surface p-8 rounded-2xl max-w-sm w-full ambient-shadow">
+            <h3 class="text-2xl font-serif text-primary mb-2">초기 비밀번호 변경</h3>
+            <p class="text-xs text-on-surface-variant mb-4">보안을 위해 초기 비밀번호를 변경해야 합니다.</p>
+            <form id="admin-change-pwd-form" class="space-y-4">
+                <input id="new-admin-password" type="password" placeholder="새 비밀번호" class="w-full bg-stone-50 border-0 border-b-2 border-outline-variant focus:ring-0 focus:border-primary px-0 py-3" required />
+                <button type="submit" class="w-full bg-primary text-on-primary py-3 rounded-full font-bold text-sm mt-4">비밀번호 변경 및 접속</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Delete Modal -->
+    <div id="delete-post-modal" class="fixed inset-0 z-[100] bg-stone-950/80 opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-6">
+        <div class="bg-surface p-8 rounded-2xl max-w-sm w-full ambient-shadow">
+            <h3 class="text-2xl font-serif text-error mb-2">기록 지우기</h3>
+            <p class="text-xs text-on-surface-variant mb-4">작성 시 입력한 비밀번호를 입력해주세요.</p>
+            <form id="delete-post-form" class="space-y-4">
+                <input id="delete-post-password" type="password" placeholder="비밀번호" class="w-full bg-stone-50 border-0 border-b-2 border-outline-variant focus:ring-0 focus:border-error px-0 py-3" required />
+                <div class="flex gap-4 mt-6">
+                    <button type="button" id="close-delete-modal" class="flex-1 py-3 text-sm font-bold text-outline hover:text-on-surface transition-colors">취소</button>
+                    <button type="submit" class="flex-1 bg-error text-on-error py-3 rounded-full font-bold text-sm hover:bg-error/90">삭제</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
+        import { getAuth, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-functions.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCOhpwPu7LwJ6FcSg4ZcRMQkfOsXjSkHSo",
@@ -534,83 +586,109 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        // --- Hero Slider Logic ---
-        const slides = document.querySelectorAll('.hero-slide');
-        const dotsContainer = document.getElementById('hero-dots');
-        let currentSlide = 0;
+        const auth = getAuth(app);
+        const functions = getFunctions(app);
 
-        if (slides.length > 0) {
-            // Create dots dynamically based on number of slides
-            slides.forEach((_, index) => {
-                const dot = document.createElement('div');
-                dot.className = `w-2 h-2 rounded-full cursor-pointer transition-all duration-300 ${index === 0 ? 'bg-white w-4' : 'bg-white/50'}`;
-                dot.addEventListener('click', () => goToSlide(index));
-                dotsContainer.appendChild(dot);
-            });
-            const dots = dotsContainer.querySelectorAll('div');
+        let isAdmin = false;
+        let currentAdminToken = null;
+        let oldAdminPasswordTemp = null;
 
-            function goToSlide(index) {
-                slides[currentSlide].classList.remove('opacity-100');
-                slides[currentSlide].classList.add('opacity-0');
-                dots[currentSlide].classList.remove('bg-white', 'w-4');
-                dots[currentSlide].classList.add('bg-white/50');
-
-                currentSlide = index;
-
-                slides[currentSlide].classList.remove('opacity-0');
-                slides[currentSlide].classList.add('opacity-100');
-                dots[currentSlide].classList.remove('bg-white/50');
-                dots[currentSlide].classList.add('bg-white', 'w-4');
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                user.getIdTokenResult().then(idTokenResult => {
+                    isAdmin = !!idTokenResult.claims.admin;
+                    renderGuestbook(); // Re-render to show delete buttons
+                });
+            } else {
+                isAdmin = false;
+                renderGuestbook();
             }
+        });
 
-            setInterval(() => {
-                let next = (currentSlide + 1) % slides.length;
-                goToSlide(next);
-            }, 5000);
-        }
-
-        // --- Gallery Lightbox Logic ---
-        const modal = document.getElementById('gallery-modal');
-        const galleryContainer = document.getElementById('gallery-container');
-        const closeBtn = document.getElementById('close-gallery');
-        const galleryTitle = document.getElementById('gallery-title');
-        const gallerySubtitle = document.getElementById('gallery-subtitle');
-
-        const roomsData = {
-            '1f': { title: '1층 가든 룸', subtitle: '1st Floor Garden Room', path: 'images/room1/details/' },
-            '2f': { title: '2층 스카이 뷰', subtitle: '2nd Floor Sky View', path: 'images/room2/details/' },
-        };
-
-        function openGallery(roomId) {
-            const data = roomsData[roomId];
-            galleryTitle.textContent = data.title;
-            gallerySubtitle.textContent = data.subtitle;
-            galleryContainer.innerHTML = '';
-
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            document.body.style.overflow = 'hidden';
-
-            for (let i = 1; i <= 30; i++) {
-                const img = new Image();
-                img.src = `${data.path}${i}.jpg`;
-                img.className = 'w-full h-auto rounded-xl object-cover ambient-shadow opacity-0 transition-opacity duration-500';
-
-                img.onload = () => {
-                    img.classList.remove('opacity-0');
-                    galleryContainer.appendChild(img);
-                };
-                img.onerror = () => {
-                    // Suppress
-                };
+        // --- Admin Auth Logic ---
+        const adminTrigger = document.getElementById('admin-trigger');
+        const adminLoginModal = document.getElementById('admin-login-modal');
+        const adminChangePwdModal = document.getElementById('admin-change-pwd-modal');
+        
+        let triggerClicks = 0;
+        let triggerTimeout;
+        adminTrigger.addEventListener('click', () => {
+            triggerClicks++;
+            if (triggerClicks >= 5) {
+                if (isAdmin) {
+                    if (confirm("관리자 로그아웃 하시겠습니까?")) {
+                        signOut(auth);
+                        alert("로그아웃 되었습니다.");
+                    }
+                } else {
+                    adminLoginModal.classList.remove('opacity-0', 'pointer-events-none');
+                }
+                triggerClicks = 0;
             }
-        }
+            clearTimeout(triggerTimeout);
+            triggerTimeout = setTimeout(() => triggerClicks = 0, 2000);
+        });
 
-        document.getElementById('btn-details-1f').addEventListener('click', () => openGallery('1f'));
-        document.getElementById('btn-details-2f').addEventListener('click', () => openGallery('2f'));
+        document.getElementById('close-admin-modal').addEventListener('click', () => {
+            adminLoginModal.classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('admin-password').value = '';
+        });
 
-        closeBtn.addEventListener('click', () => {
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            document.body.style.overflow = '';
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('admin-password').value;
+            const loginBtn = e.target.querySelector('button[type="submit"]');
+            loginBtn.textContent = '확인 중...';
+            loginBtn.disabled = true;
+
+            try {
+                const adminLoginCall = httpsCallable(functions, 'adminLogin');
+                const result = await adminLoginCall({ password });
+                
+                if (result.data.isFirstLogin) {
+                    oldAdminPasswordTemp = password;
+                    adminLoginModal.classList.add('opacity-0', 'pointer-events-none');
+                    adminChangePwdModal.classList.remove('opacity-0', 'pointer-events-none');
+                } else if (result.data.token) {
+                    await signInWithCustomToken(auth, result.data.token);
+                    adminLoginModal.classList.add('opacity-0', 'pointer-events-none');
+                    alert("관리자로 로그인되었습니다.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert(error.message || "로그인 실패");
+            } finally {
+                loginBtn.textContent = '로그인';
+                loginBtn.disabled = false;
+                document.getElementById('admin-password').value = '';
+            }
+        });
+
+        document.getElementById('admin-change-pwd-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('new-admin-password').value;
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.textContent = '처리 중...';
+            btn.disabled = true;
+
+            try {
+                const changePwdCall = httpsCallable(functions, 'changeAdminPassword');
+                const result = await changePwdCall({ oldPassword: oldAdminPasswordTemp, newPassword });
+                
+                if (result.data.success && result.data.token) {
+                    await signInWithCustomToken(auth, result.data.token);
+                    adminChangePwdModal.classList.add('opacity-0', 'pointer-events-none');
+                    alert("비밀번호가 변경되고 관리자로 로그인되었습니다.");
+                    oldAdminPasswordTemp = null;
+                }
+            } catch (error) {
+                console.error(error);
+                alert(error.message || "비밀번호 변경 실패");
+            } finally {
+                btn.textContent = '비밀번호 변경 및 접속';
+                btn.disabled = false;
+                document.getElementById('new-admin-password').value = '';
+            }
         });
 
         // --- Guestbook Logic ---
@@ -620,11 +698,19 @@
         const audioInput = document.getElementById('gb-audio');
         const submitBtn = form.querySelector('button[type="submit"]');
 
+        let guestbookData = [];
+
         // File upload label update
         audioInput.addEventListener('change', (e) => {
             const label = e.target.parentElement.querySelector('span:nth-of-type(2)');
             if (e.target.files.length > 0) {
-                label.textContent = e.target.files[0].name;
+                const file = e.target.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    alert("파일이 너무 큽니다(최대 5MB)");
+                    e.target.value = "";
+                    return;
+                }
+                label.textContent = file.name;
                 label.classList.add('text-primary', 'font-bold');
             }
         });
@@ -642,8 +728,8 @@
             }
 
             for (let i = 0; i < files.length; i++) {
-                if (files[i].size > 1024 * 1024) { // 1MB
-                    alert("사진의 용량은 한 장당 1MB 이하여야 합니다: " + files[i].name);
+                if (files[i].size > 5 * 1024 * 1024) { // 5MB
+                    alert("파일이 너무 큽니다(최대 5MB): " + files[i].name);
                     e.target.value = "";
                     label.textContent = "추억 사진 업로드 (최대 2장) / Upload photos";
                     label.classList.remove('text-primary');
@@ -660,20 +746,35 @@
             }
         });
 
-        // Mock data for testing 6 entries, 2 with images
-        const mockData = [
-            { id: 'm1', name: '가을 여행자', message: '영종도의 노을이 너무 아름다웠어요. 가든룸의 이끼 정원 덕분에 아침에 상쾌하게 일어날 수 있었습니다. 좋은 추억 남기고 갑니다!', createdAt: new Date('2026-05-21T09:00:00'), photoUrls: ['images/room1/1.jpg', 'images/room1/2.jpg'] },
-            { id: 'm2', name: '바다 사랑', message: '웰컴 드링크 너무 감사히 잘 마셨습니다. 2층 뷰가 정말 환상적이네요. 다음에 또 오고 싶어요.', createdAt: new Date('2026-05-20T18:30:00'), photoUrls: [] },
-            { id: 'm3', name: '지친 직장인', message: '조용한 곳에서 온전히 쉬고 싶어서 찾았는데 탁월한 선택이었습니다. 새소리만 들리는 아침이 너무 좋았어요.', createdAt: new Date('2026-05-19T10:15:00'), photoUrls: ['images/room2/1.jpg'] },
-            { id: 'm4', name: '가족 여행', message: '부모님 모시고 왔는데 너무 만족해하셨습니다. 침구도 훌륭하고 모든 공간이 정성스럽게 관리된 느낌을 받았어요.', createdAt: new Date('2026-05-18T14:20:00'), photoUrls: [], reply: '가족분들과 뜻깊은 시간 보내셨다니 호스트로서 정말 기쁩니다. 다음에도 꼭 다시 방문해 주세요!' },
-            { id: 'm5', name: '영종도 러버', message: '사색의 정원에서 보낸 시간이 가장 기억에 남습니다. 자연이 주는 치유가 뭔지 알게 되었네요.', createdAt: new Date('2026-05-17T20:10:00'), photoUrls: [] },
-            { id: 'm6', name: '쉼표', message: '바쁘게 달려온 일상에 큰 위로가 되었습니다. 공간이 주는 힘이 대단하다는 걸 느꼈습니다. 감사합니다.', createdAt: new Date('2026-05-16T11:40:00'), photoUrls: [] },
-        ];
+        async function compressImage(file) {
+            const options = {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true
+            };
+            try {
+                return await imageCompression(file, options);
+            } catch (error) {
+                console.error("Compression error:", error);
+                return file; // Fallback to original
+            }
+        }
 
-        // Load existing entries (Mocked)
-        function renderMockData() {
+        const q = query(collection(db, "guestbook"), orderBy("createdAt", "desc"), limit(5));
+        onSnapshot(q, (snapshot) => {
+            guestbookData = [];
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.createdAt) {
+                    guestbookData.push({ id: doc.id, ...data });
+                }
+            });
+            renderGuestbook();
+        });
+
+        function renderGuestbook() {
             list.innerHTML = "";
-            mockData.forEach((data) => {
+            guestbookData.forEach((data) => {
                 const audioHTML = data.audioUrl ? `
                 <div class="mt-4">
                     <audio src="${data.audioUrl}" controls class="w-full h-10 outline-none rounded-full"></audio>
@@ -685,12 +786,21 @@
                     <p class="text-xs text-on-surface-variant leading-relaxed">${data.reply}</p>
                 </div>` : '';
 
-                const dateStr = data.createdAt.toLocaleDateString();
+                const dateStr = data.createdAt ? data.createdAt.toDate().toLocaleDateString() : '';
                 const entryId = 'qr-' + data.id;
 
+                const deleteBtnHtml = (isAdmin || data.password) ? `
+                    <button onclick="requestDelete('${data.id}')" class="text-error hover:bg-error-container p-1 rounded transition-colors" title="기록 지우기">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                ` : '';
+
                 const entryDiv = document.createElement('div');
-                entryDiv.className = 'bg-white p-6 rounded-xl border border-stone-100 shadow-sm transition-all hover:shadow-md';
+                entryDiv.className = 'bg-white p-6 rounded-xl border border-stone-100 shadow-sm transition-all hover:shadow-md relative group';
                 entryDiv.innerHTML = `
+                <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    ${deleteBtnHtml}
+                </div>
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <h4 class="font-bold text-primary">${data.name}</h4>
@@ -714,106 +824,112 @@
                 }
             });
         }
-        renderMockData();
 
-        /*
-        const q = query(collection(db, "guestbook"), orderBy("createdAt", "desc"));
-        onSnapshot(q, (snapshot) => {
-            list.innerHTML = "";
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                if (!data.createdAt) return; // Skip temporary rendering state
-                const audioHTML = data.audioUrl ? `
-                <div class="mt-4">
-                    <audio src="${data.audioUrl}" controls class="w-full h-10 outline-none rounded-full"></audio>
-                </div>` : '';
-
-                const replyHTML = data.reply ? `
-                <div class="mt-6 bg-surface-container-low p-4 rounded-xl border-l-4 border-primary">
-                    <p class="text-xs md:text-[10px] font-bold text-primary mb-2 uppercase tracking-widest">FOR.REST STAY 호스트의 답글</p>
-                    <p class="text-xs text-on-surface-variant leading-relaxed">${data.reply}</p>
-                </div>` : '';
-
-                const dateStr = data.createdAt.toDate().toLocaleDateString();
-                const entryId = 'qr-' + doc.id;
-
-                const entryDiv = document.createElement('div');
-                entryDiv.className = 'bg-white p-6 rounded-xl border border-stone-100 shadow-sm transition-all hover:shadow-md';
-                entryDiv.innerHTML = `
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h4 class="font-bold text-primary">${data.name}</h4>
-                        <p class="text-xs md:text-[10px] text-outline uppercase tracking-wider">업로드 일자: ${dateStr}</p>
-                    </div>
-                    <div class="w-16 h-16 bg-white p-1 border border-outline-variant rounded flex items-center justify-center">
-                        <div id="${entryId}"></div>
-                    </div>
-                </div>
-                <p class="text-on-surface text-sm leading-relaxed mb-4 whitespace-pre-line">${data.message}</p>
-                ${data.photoUrls && data.photoUrls.length > 0 ? `<div class="grid grid-cols-2 gap-4 my-4">${data.photoUrls.map(url => `<img src="${url}" class="w-full aspect-square rounded-xl object-cover border border-stone-100">`).join('')}</div>` : ''}
-                ${audioHTML}
-                ${replyHTML}
-                `;
-                list.appendChild(entryDiv);
-
-                if (data.audioUrl) {
-                    new QRCode(document.getElementById(entryId), {
-                        text: data.audioUrl, width: 54, height: 54, colorDark: "#234c29", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L
-                    });
+        // Global function for delete button click
+        let targetDeleteId = null;
+        window.requestDelete = async (id) => {
+            if (isAdmin) {
+                if (confirm("관리자 권한으로 이 기록과 연관된 미디어를 영구 삭제하시겠습니까?")) {
+                    executeDelete(id, null);
                 }
-            });
+            } else {
+                targetDeleteId = id;
+                document.getElementById('delete-post-modal').classList.remove('opacity-0', 'pointer-events-none');
+            }
+        };
+
+        document.getElementById('close-delete-modal').addEventListener('click', () => {
+            document.getElementById('delete-post-modal').classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('delete-post-password').value = '';
+            targetDeleteId = null;
         });
-        */
+
+        document.getElementById('delete-post-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const pwd = document.getElementById('delete-post-password').value;
+            if (confirm("정말로 이 기록을 삭제하시겠습니까? (미디어 포함 영구 삭제)")) {
+                executeDelete(targetDeleteId, pwd);
+            }
+        });
+
+        async function executeDelete(id, password) {
+            const deleteModal = document.getElementById('delete-post-modal');
+            const btn = document.querySelector('#delete-post-form button[type="submit"]');
+            if (btn) {
+                btn.textContent = '삭제 중...';
+                btn.disabled = true;
+            }
+
+            try {
+                const deleteCall = httpsCallable(functions, 'deleteGuestbookEntry');
+                await deleteCall({ entryId: id, password: password });
+                
+                alert("삭제되었습니다.");
+                deleteModal.classList.add('opacity-0', 'pointer-events-none');
+            } catch (error) {
+                console.error(error);
+                alert(error.message || "삭제 실패");
+            } finally {
+                if (btn) {
+                    btn.textContent = '삭제';
+                    btn.disabled = false;
+                }
+                document.getElementById('delete-post-password').value = '';
+                targetDeleteId = null;
+            }
+        }
 
         form.addEventListener('submit', async function (e) {
             e.preventDefault();
             const name = document.getElementById('gb-name').value;
             const message = document.getElementById('gb-message').value;
+            const password = document.getElementById('gb-password').value;
             const audioFile = audioInput.files.length > 0 ? audioInput.files[0] : null;
             const photoFiles = photoInput.files;
 
-            if (audioFile || photoFiles.length > 0) {
-                // UI Loading state
-                const originalBtnText = submitBtn.textContent;
-                submitBtn.textContent = "기록 업로드 중... / Uploading...";
-                submitBtn.disabled = true;
+            // UI Loading state
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = "기록 업로드 중... / Uploading...";
+            submitBtn.disabled = true;
 
-                try {
-                    let audioUrl = null;
-                    if (audioFile) {
-                        const storageRef = ref(storage, 'guestbook/' + Date.now() + '-' + audioFile.name);
-                        await uploadBytes(storageRef, audioFile);
-                        audioUrl = await getDownloadURL(storageRef);
-                    }
-
-                    const photoUrls = [];
-                    for (let i = 0; i < photoFiles.length; i++) {
-                        const pRef = ref(storage, 'guestbook/photos/' + Date.now() + '-' + photoFiles[i].name);
-                        await uploadBytes(pRef, photoFiles[i]);
-                        photoUrls.push(await getDownloadURL(pRef));
-                    }
-
-                    await addDoc(collection(db, "guestbook"), {
-                        name: name,
-                        message: message,
-                        audioUrl: audioUrl,
-                        photoUrls: photoUrls,
-                        createdAt: serverTimestamp(),
-                        reply: null
-                    });
-
-                    form.reset();
-                    form.querySelector('#gb-audio').parentElement.querySelector('span:nth-of-type(2)').textContent = '음악 파일 혹은 음성 업로드 / Upload an audio file';
-                    form.querySelector('#gb-audio').parentElement.querySelector('span:nth-of-type(2)').classList.remove('text-primary', 'font-bold');
-                    form.querySelector('#gb-photos').parentElement.querySelector('span.font-bold').textContent = '추억 사진 업로드 (최대 2장) / Upload photos';
-                    form.querySelector('#gb-photos').parentElement.querySelector('span.font-bold').classList.remove('text-primary');
-                } catch (error) {
-                    console.error("Error adding document: ", error);
-                    alert("업로드 중 오류가 발생했습니다.");
-                } finally {
-                    submitBtn.textContent = originalBtnText;
-                    submitBtn.disabled = false;
+            try {
+                let audioUrl = null;
+                if (audioFile) {
+                    const storageRef = ref(storage, 'guestbook/' + Date.now() + '-' + audioFile.name);
+                    await uploadBytes(storageRef, audioFile);
+                    audioUrl = await getDownloadURL(storageRef);
                 }
+
+                const photoUrls = [];
+                for (let i = 0; i < photoFiles.length; i++) {
+                    const compressedFile = await compressImage(photoFiles[i]);
+                    const pRef = ref(storage, 'guestbook/photos/' + Date.now() + '-' + compressedFile.name);
+                    await uploadBytes(pRef, compressedFile);
+                    photoUrls.push(await getDownloadURL(pRef));
+                }
+
+                await addDoc(collection(db, "guestbook"), {
+                    name: name,
+                    message: message,
+                    password: password, // For real production, hash it here with Web Crypto API. Saving plain for now per simple requirements.
+                    audioUrl: audioUrl,
+                    photoUrls: photoUrls,
+                    createdAt: serverTimestamp(),
+                    reply: null
+                });
+
+                form.reset();
+                form.querySelector('#gb-audio').parentElement.querySelector('span:nth-of-type(2)').textContent = '음악 파일 혹은 음성 업로드 / Upload an audio file';
+                form.querySelector('#gb-audio').parentElement.querySelector('span:nth-of-type(2)').classList.remove('text-primary', 'font-bold');
+                form.querySelector('#gb-photos').parentElement.querySelector('span.font-bold').textContent = '추억 사진 업로드 (최대 2장) / Upload photos';
+                form.querySelector('#gb-photos').parentElement.querySelector('span.font-bold').classList.remove('text-primary');
+                alert("기록이 성공적으로 저장되었습니다!");
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("업로드 중 오류가 발생했습니다.");
+            } finally {
+                submitBtn.textContent = originalBtnText;
+                submitBtn.disabled = false;
             }
         });
 

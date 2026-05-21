@@ -2,9 +2,16 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Anyone can read and write guestbook entries for testing/simplicity
     match /guestbook/{document=**} {
-      allow read, write: if true;
+      allow read: if true;
+      allow create: if true; // We can add basic validation if needed
+      // Delete is handled by Cloud Functions to verify passwords
+      allow update, delete: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    match /settings/{document=**} {
+      // Admin rate limits and auth data
+      allow read, write: if false; // Only Cloud Functions can access this
     }
   }
 }
