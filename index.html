@@ -142,6 +142,22 @@
         body {
             min-height: max(884px, 100dvh);
         }
+
+        /* Custom scrollbar for guestbook feed */
+        .guestbook-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .guestbook-scroll::-webkit-scrollbar-track {
+            background: #f1f1e6; /* surface-container */
+            border-radius: 4px;
+        }
+        .guestbook-scroll::-webkit-scrollbar-thumb {
+            background: #a4d2a4; /* inverse-primary */
+            border-radius: 4px;
+        }
+        .guestbook-scroll::-webkit-scrollbar-thumb:hover {
+            background: #8fbc8f; /* primary-container */
+        }
     </style>
 </head>
 
@@ -364,72 +380,80 @@
     </section>
     <!-- Guestbook -->
     <section class="py-24 bg-surface px-6" id="guestbook">
-        <div class="max-w-2xl mx-auto">
-            <h2 class="text-3xl text-primary mb-8 text-center leading-tight">
-                방명록
-                <span class="bilingual-sub uppercase tracking-widest text-primary/80">Guestbook</span>
-            </h2>
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[4fr_6fr] gap-12 items-start">
+            <!-- Left Area A: Guestbook Info & Form -->
+            <div class="flex flex-col md:sticky md:top-32">
+                <h2 class="text-3xl text-primary mb-8 text-center md:text-left leading-tight">
+                    방명록
+                    <span class="bilingual-sub uppercase tracking-widest text-primary/80">Guestbook</span>
+                </h2>
 
-            <!-- Host Notice -->
-            <div
-                class="bg-surface-container-low border border-outline-variant/60 p-6 rounded-2xl mb-8 flex gap-4 items-start">
-                <span class="material-symbols-outlined text-primary shrink-0"
-                    style="font-variation-settings: 'FILL' 1;">campaign</span>
-                <div>
-                    <h3 class="text-xs md:text-[10px] font-bold text-primary mb-1.5 tracking-widest uppercase">호스트 알림 /
-                        Host Notice
-                    </h3>
-                    <p class="text-sm text-on-surface-variant leading-relaxed break-keep">
-                        이번 주 방문하시는 분들께 웰컴 드링크로 특별한 칵테일 한 잔을 무료로 안내해 드립니다. 머무시는 동안 온전한 휴식을 누리시길 바랍니다.
-                    </p>
+                <!-- Host Notice -->
+                <div
+                    class="bg-surface-container-low border border-outline-variant/60 p-6 rounded-2xl mb-8 flex gap-4 items-start">
+                    <span class="material-symbols-outlined text-primary shrink-0"
+                        style="font-variation-settings: 'FILL' 1;">campaign</span>
+                    <div>
+                        <h3 class="text-xs md:text-[10px] font-bold text-primary mb-1.5 tracking-widest uppercase">호스트 알림 /
+                            Host Notice
+                        </h3>
+                        <p class="text-sm text-on-surface-variant leading-relaxed break-keep">
+                            이번 주 방문하시는 분들께 웰컴 드링크로 특별한 칵테일 한 잔을 무료로 안내해 드립니다. 머무시는 동안 온전한 휴식을 누리시길 바랍니다.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <div class="bg-white p-8 rounded-2xl ambient-shadow mb-8 md:mb-0 border border-stone-100">
+                    <form id="guestbook-form" class="space-y-6">
+                        <div class="relative">
+                            <label
+                                class="text-xs md:text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1 block">이름
+                                / Your Name</label>
+                            <input id="gb-name"
+                                class="w-full bg-stone-50 border-0 border-b-2 border-outline-variant focus:ring-0 focus:border-primary px-0 py-3 text-on-surface placeholder:text-outline"
+                                placeholder="머물다 가는 여행자 / Resting Traveler" type="text" required />
+                        </div>
+                        <div class="relative">
+                            <label
+                                class="text-xs md:text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1 block">내용
+                                / Message</label>
+                            <textarea id="gb-message"
+                                class="w-full bg-stone-50 border-0 border-b-2 border-outline-variant focus:ring-0 focus:border-primary px-0 py-3 text-on-surface placeholder:text-outline"
+                                placeholder="이곳에서의 순간을 나누어 주세요... / Share your moment..." rows="3" required></textarea>
+                        </div>
+                        <label
+                            class="cursor-pointer flex items-center gap-4 bg-surface-container-low p-4 rounded-xl hover:bg-surface-dim transition-colors mb-2">
+                            <span class="material-symbols-outlined text-primary">add_photo_alternate</span>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-on-surface-variant font-bold text-gray-800">추억 사진 업로드 (최대 2장) /
+                                    Upload photos</span>
+                                <span class="text-xs md:text-[10px] text-on-surface-variant mt-1 opacity-80">※ 용량 제한: 각 사진당
+                                    1MB
+                                    이하</span>
+                            </div>
+                            <input id="gb-photos" type="file" accept="image/*" multiple class="hidden">
+                        </label>
+                        <label
+                            class="cursor-pointer flex items-center gap-4 bg-surface-container-low p-4 rounded-xl hover:bg-surface-dim transition-colors">
+                            <span class="material-symbols-outlined text-primary">audio_file</span>
+                            <span class="text-xs text-on-surface-variant">음악 파일 혹은 음성 업로드 / Upload an audio file</span>
+                            <input id="gb-audio" type="file" accept="audio/*" class="hidden">
+                        </label>
+                        <button type="submit"
+                            class="w-full bg-primary text-on-primary py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-on-primary-container transition-colors">추억
+                            기록하기 / Post Memory</button>
+                    </form>
                 </div>
             </div>
 
-            <!-- Form -->
-            <div class="bg-white p-8 rounded-2xl ambient-shadow mb-16 border border-stone-100">
-                <form id="guestbook-form" class="space-y-6">
-                    <div class="relative">
-                        <label
-                            class="text-xs md:text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1 block">이름
-                            / Your Name</label>
-                        <input id="gb-name"
-                            class="w-full bg-stone-50 border-0 border-b-2 border-outline-variant focus:ring-0 focus:border-primary px-0 py-3 text-on-surface placeholder:text-outline"
-                            placeholder="머물다 가는 여행자 / Resting Traveler" type="text" required />
+            <!-- Right Area B: Notes List Feed -->
+            <div class="flex flex-col">
+                <div class="overflow-y-auto pr-2 md:pr-4 guestbook-scroll max-h-[800px]">
+                    <div id="guestbook-list" class="space-y-6">
+                        <!-- Entries injected here by JS -->
                     </div>
-                    <div class="relative">
-                        <label
-                            class="text-xs md:text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1 block">내용
-                            / Message</label>
-                        <textarea id="gb-message"
-                            class="w-full bg-stone-50 border-0 border-b-2 border-outline-variant focus:ring-0 focus:border-primary px-0 py-3 text-on-surface placeholder:text-outline"
-                            placeholder="이곳에서의 순간을 나누어 주세요... / Share your moment..." rows="3" required></textarea>
-                    </div>
-                    <label
-                        class="cursor-pointer flex items-center gap-4 bg-surface-container-low p-4 rounded-xl hover:bg-surface-dim transition-colors mb-2">
-                        <span class="material-symbols-outlined text-primary">add_photo_alternate</span>
-                        <div class="flex flex-col">
-                            <span class="text-xs text-on-surface-variant font-bold text-gray-800">추억 사진 업로드 (최대 2장) /
-                                Upload photos</span>
-                            <span class="text-xs md:text-[10px] text-on-surface-variant mt-1 opacity-80">※ 용량 제한: 각 사진당
-                                1MB
-                                이하</span>
-                        </div>
-                        <input id="gb-photos" type="file" accept="image/*" multiple class="hidden">
-                    </label>
-                    <label
-                        class="cursor-pointer flex items-center gap-4 bg-surface-container-low p-4 rounded-xl hover:bg-surface-dim transition-colors">
-                        <span class="material-symbols-outlined text-primary">audio_file</span>
-                        <span class="text-xs text-on-surface-variant">음악 파일 혹은 음성 업로드 / Upload an audio file</span>
-                        <input id="gb-audio" type="file" accept="audio/*" class="hidden">
-                    </label>
-                    <button type="submit"
-                        class="w-full bg-primary text-on-primary py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-on-primary-container transition-colors">추억
-                        기록하기 / Post Memory</button>
-                </form>
-            </div>
-            <!-- Notes List -->
-            <div id="guestbook-list" class="space-y-8">
-                <!-- Entries injected here by JS -->
+                </div>
             </div>
         </div>
     </section>
@@ -636,7 +660,63 @@
             }
         });
 
-        // Load existing entries
+        // Mock data for testing 6 entries, 2 with images
+        const mockData = [
+            { id: 'm1', name: '가을 여행자', message: '영종도의 노을이 너무 아름다웠어요. 가든룸의 이끼 정원 덕분에 아침에 상쾌하게 일어날 수 있었습니다. 좋은 추억 남기고 갑니다!', createdAt: new Date('2026-05-21T09:00:00'), photoUrls: ['images/room1/1.jpg', 'images/room1/2.jpg'] },
+            { id: 'm2', name: '바다 사랑', message: '웰컴 드링크 너무 감사히 잘 마셨습니다. 2층 뷰가 정말 환상적이네요. 다음에 또 오고 싶어요.', createdAt: new Date('2026-05-20T18:30:00'), photoUrls: [] },
+            { id: 'm3', name: '지친 직장인', message: '조용한 곳에서 온전히 쉬고 싶어서 찾았는데 탁월한 선택이었습니다. 새소리만 들리는 아침이 너무 좋았어요.', createdAt: new Date('2026-05-19T10:15:00'), photoUrls: ['images/room2/1.jpg'] },
+            { id: 'm4', name: '가족 여행', message: '부모님 모시고 왔는데 너무 만족해하셨습니다. 침구도 훌륭하고 모든 공간이 정성스럽게 관리된 느낌을 받았어요.', createdAt: new Date('2026-05-18T14:20:00'), photoUrls: [], reply: '가족분들과 뜻깊은 시간 보내셨다니 호스트로서 정말 기쁩니다. 다음에도 꼭 다시 방문해 주세요!' },
+            { id: 'm5', name: '영종도 러버', message: '사색의 정원에서 보낸 시간이 가장 기억에 남습니다. 자연이 주는 치유가 뭔지 알게 되었네요.', createdAt: new Date('2026-05-17T20:10:00'), photoUrls: [] },
+            { id: 'm6', name: '쉼표', message: '바쁘게 달려온 일상에 큰 위로가 되었습니다. 공간이 주는 힘이 대단하다는 걸 느꼈습니다. 감사합니다.', createdAt: new Date('2026-05-16T11:40:00'), photoUrls: [] },
+        ];
+
+        // Load existing entries (Mocked)
+        function renderMockData() {
+            list.innerHTML = "";
+            mockData.forEach((data) => {
+                const audioHTML = data.audioUrl ? `
+                <div class="mt-4">
+                    <audio src="${data.audioUrl}" controls class="w-full h-10 outline-none rounded-full"></audio>
+                </div>` : '';
+
+                const replyHTML = data.reply ? `
+                <div class="mt-6 bg-surface-container-low p-4 rounded-xl border-l-4 border-primary">
+                    <p class="text-xs md:text-[10px] font-bold text-primary mb-2 uppercase tracking-widest">FOR.REST STAY 호스트의 답글</p>
+                    <p class="text-xs text-on-surface-variant leading-relaxed">${data.reply}</p>
+                </div>` : '';
+
+                const dateStr = data.createdAt.toLocaleDateString();
+                const entryId = 'qr-' + data.id;
+
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'bg-white p-6 rounded-xl border border-stone-100 shadow-sm transition-all hover:shadow-md';
+                entryDiv.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h4 class="font-bold text-primary">${data.name}</h4>
+                        <p class="text-xs md:text-[10px] text-outline uppercase tracking-wider">업로드 일자: ${dateStr}</p>
+                    </div>
+                    <div class="w-16 h-16 bg-white p-1 border border-outline-variant rounded flex items-center justify-center">
+                        <div id="${entryId}"></div>
+                    </div>
+                </div>
+                <p class="text-on-surface text-sm leading-relaxed mb-4 whitespace-pre-line">${data.message}</p>
+                ${data.photoUrls && data.photoUrls.length > 0 ? `<div class="grid grid-cols-2 gap-4 my-4">${data.photoUrls.map(url => `<img src="${url}" class="w-full aspect-square rounded-xl object-cover border border-stone-100">`).join('')}</div>` : ''}
+                ${audioHTML}
+                ${replyHTML}
+                `;
+                list.appendChild(entryDiv);
+
+                if (data.audioUrl) {
+                    new QRCode(document.getElementById(entryId), {
+                        text: data.audioUrl, width: 54, height: 54, colorDark: "#234c29", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L
+                    });
+                }
+            });
+        }
+        renderMockData();
+
+        /*
         const q = query(collection(db, "guestbook"), orderBy("createdAt", "desc"));
         onSnapshot(q, (snapshot) => {
             list.innerHTML = "";
@@ -683,6 +763,7 @@
                 }
             });
         });
+        */
 
         form.addEventListener('submit', async function (e) {
             e.preventDefault();
@@ -821,6 +902,13 @@
         fetchIcalData(airbnbIcalUrl2F, bookedDates2F, render2F);
 
     </script>
+
+    <!-- 플로팅 카카오톡 1:1 상담 버튼 -->
+    <a href="http://pf.kakao.com/_xxxxxx/chat" target="_blank" title="카카오톡 1:1 상담하기"
+        class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#FEE500] text-[#3C1E1E] rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 md:bottom-10 md:right-10 overflow-hidden">
+        <span class="material-symbols-outlined text-[28px]"
+            style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+    </a>
 </body>
 
 </html>
