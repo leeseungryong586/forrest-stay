@@ -750,7 +750,8 @@
             const options = {
                 maxSizeMB: 1,
                 maxWidthOrHeight: 1920,
-                useWebWorker: true
+                useWebWorker: true,
+                initialQuality: 0.7
             };
             try {
                 return await imageCompression(file, options);
@@ -918,20 +919,24 @@
             submitBtn.disabled = true;
 
             try {
-                let audioUrl = null;
-                if (audioFile) {
-                    const storageRef = ref(storage, 'guestbook/' + Date.now() + '-' + audioFile.name);
+                // Run audio and photo uploads concurrently
+                const audioPromise = audioFile ? (async () => {
+                    const storageRef = ref(storage, 'guestbook/' + Date.now() + '-audio-' + audioFile.name);
                     await uploadBytes(storageRef, audioFile);
-                    audioUrl = await getDownloadURL(storageRef);
-                }
+                    return await getDownloadURL(storageRef);
+                })() : Promise.resolve(null);
 
-                const photoUrls = [];
-                for (let i = 0; i < photoFiles.length; i++) {
-                    const compressedFile = await compressImage(photoFiles[i]);
-                    const pRef = ref(storage, 'guestbook/photos/' + Date.now() + '-' + compressedFile.name);
+                const photoPromises = Array.from(photoFiles).map(async (file, index) => {
+                    const compressedFile = await compressImage(file);
+                    const pRef = ref(storage, 'guestbook/photos/' + Date.now() + '-' + index + '-' + compressedFile.name);
                     await uploadBytes(pRef, compressedFile);
-                    photoUrls.push(await getDownloadURL(pRef));
-                }
+                    return await getDownloadURL(pRef);
+                });
+
+                const [audioUrl, photoUrls] = await Promise.all([
+                    audioPromise,
+                    Promise.all(photoPromises)
+                ]);
 
                 await addDoc(collection(db, "guestbook"), {
                     name: name,
