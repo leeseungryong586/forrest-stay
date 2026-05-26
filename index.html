@@ -765,15 +765,17 @@
             guestbookData = [];
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                if (data.createdAt) {
-                    guestbookData.push({ id: doc.id, ...data });
-                }
+                guestbookData.push({ id: doc.id, ...data });
             });
             renderGuestbook();
         });
 
         function renderGuestbook() {
             list.innerHTML = "";
+            if (guestbookData.length === 0) {
+                list.innerHTML = `<div class="text-center text-on-surface-variant p-8 bg-surface-container-low rounded-2xl">아직 남겨진 방명록이 없습니다. 첫 번째 이야기를 남겨주세요.</div>`;
+                return;
+            }
             guestbookData.forEach((data) => {
                 const audioHTML = data.audioUrl ? `
                 <div class="mt-4">
@@ -786,7 +788,19 @@
                     <p class="text-xs text-on-surface-variant leading-relaxed">${data.reply}</p>
                 </div>` : '';
 
-                const dateStr = data.createdAt ? data.createdAt.toDate().toLocaleDateString() : '';
+                let dateStr = '';
+                if (data.createdAt) {
+                    if (typeof data.createdAt.toDate === 'function') {
+                        dateStr = data.createdAt.toDate().toLocaleDateString();
+                    } else if (data.createdAt.seconds) {
+                        dateStr = new Date(data.createdAt.seconds * 1000).toLocaleDateString();
+                    } else {
+                        dateStr = new Date(data.createdAt).toLocaleDateString();
+                    }
+                } else {
+                    dateStr = new Date().toLocaleDateString(); // pending write
+                }
+                
                 const entryId = 'qr-' + data.id;
 
                 const deleteBtnHtml = (isAdmin || data.password) ? `
@@ -818,9 +832,11 @@
                 list.appendChild(entryDiv);
 
                 if (data.audioUrl) {
-                    new QRCode(document.getElementById(entryId), {
-                        text: data.audioUrl, width: 54, height: 54, colorDark: "#234c29", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L
-                    });
+                    try {
+                        new QRCode(entryDiv.querySelector('#' + entryId), {
+                            text: data.audioUrl, width: 54, height: 54, colorDark: "#234c29", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L
+                        });
+                    } catch(e) { console.error("QR Code error:", e); }
                 }
             });
         }
