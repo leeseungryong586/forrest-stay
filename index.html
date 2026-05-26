@@ -760,13 +760,22 @@
             }
         }
 
-        const q = query(collection(db, "guestbook"), orderBy("createdAt", "desc"), limit(5));
+        const q = query(collection(db, "guestbook"));
         onSnapshot(q, (snapshot) => {
-            guestbookData = [];
+            let allData = [];
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                guestbookData.push({ id: doc.id, ...data });
+                allData.push({ id: doc.id, ...data });
             });
+            
+            // Sort by descending date
+            allData.sort((a, b) => {
+                const timeA = a.createdAt ? (typeof a.createdAt.toDate === 'function' ? a.createdAt.toDate().getTime() : (a.createdAt.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt).getTime())) : 0;
+                const timeB = b.createdAt ? (typeof b.createdAt.toDate === 'function' ? b.createdAt.toDate().getTime() : (b.createdAt.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt).getTime())) : 0;
+                return timeB - timeA;
+            });
+            
+            guestbookData = allData.slice(0, 15); // Show top 15 records
             renderGuestbook();
         });
 
