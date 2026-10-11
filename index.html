@@ -88,6 +88,7 @@
         }
     </script>
     <style>
+        #admin-booking-link[hidden] { display: none !important; }
         body {
             font-family: 'Manrope', sans-serif;
             background-color: #fcfcf7;
@@ -387,6 +388,7 @@ html{scroll-behavior:smooth;scroll-padding-top:110px}section[id]{scroll-margin-t
         <div class="max-w-7xl mx-auto px-6 md:px-12 py-20 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-12">
             <div>
                 <span id="admin-trigger" class="text-lg font-serif text-emerald-900 block mb-4 cursor-pointer transition-colors hover:text-primary">FOR.REST STAY</span>
+                <a id="admin-booking-link" hidden href="https://forrest-stay-admin.web.app/" target="_blank" rel="noopener noreferrer" class="inline-flex mb-6 rounded-full bg-emerald-900 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-800"><span data-copy-ko="예약 관리 열기" data-copy-en="Open booking manager">Open booking manager</span></a>
                 <p class="text-stone-500 font-serif text-sm tracking-loose"><span data-copy-ko="© 2024 FOR.REST STAY. 평온을 위해 큐레이팅된 공간." data-copy-en="© 2024 FOR.REST STAY. Curated for peace.">© 2024 FOR.REST STAY. Curated for peace.</span></p>
                 <p class="text-stone-400 font-serif text-xs md:text-[10px] uppercase tracking-widest mt-1">Curated for
                     peace.</p>
@@ -490,14 +492,22 @@ if (!window.FORREST_PREVIEW) {
         let oldAdminPasswordTemp = null;
 
         onAuthStateChanged(auth, (user) => {
+            const bookingLink = document.getElementById('admin-booking-link');
+            isAdmin = false;
+            bookingLink.hidden = true;
+            renderGuestbook();
             if (user) {
                 user.getIdTokenResult().then(idTokenResult => {
+                    if (auth.currentUser?.uid !== user.uid) return;
                     isAdmin = !!idTokenResult.claims.admin;
+                    bookingLink.hidden = !isAdmin;
                     renderGuestbook(); // Re-render to show delete buttons
+                }).catch(() => {
+                    if (auth.currentUser?.uid !== user.uid) return;
+                    isAdmin = false;
+                    bookingLink.hidden = true;
+                    renderGuestbook();
                 });
-            } else {
-                isAdmin = false;
-                renderGuestbook();
             }
         });
 
