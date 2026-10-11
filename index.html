@@ -1017,10 +1017,10 @@ if (!window.FORREST_PREVIEW) {
     <button id="admin-recovery-google" type="button" class="admin-recovery-primary" disabled><span data-copy-ko="Google 계정으로 본인 확인" data-copy-en="Verify with Google">Verify with Google</span></button>
     <form id="admin-reset-form" hidden>
       <label for="admin-reset-password"><span data-copy-ko="새 관리자 비밀번호" data-copy-en="New host password">New host password</span></label>
-      <input id="admin-reset-password" name="newPassword" type="password" autocomplete="new-password" minlength="12" maxlength="72" required aria-describedby="admin-reset-password-help">
-      <p id="admin-reset-password-help" class="admin-recovery-help"><span data-copy-ko="12자 이상으로 설정해 주세요. 최대 72바이트이며 한글은 글자당 보통 3바이트입니다." data-copy-en="Use at least 12 characters, up to 72 UTF-8 bytes.">Use at least 12 characters, up to 72 UTF-8 bytes.</span></p>
+      <input id="admin-reset-password" name="newPassword" type="password" autocomplete="new-password" minlength="4" maxlength="72" required aria-describedby="admin-reset-password-help">
+      <p id="admin-reset-password-help" class="admin-recovery-help"><span data-copy-ko="4자 이상으로 설정해 주세요. 최대 72바이트이며 한글은 글자당 보통 3바이트입니다." data-copy-en="Use at least 4 characters, up to 72 UTF-8 bytes.">Use at least 4 characters, up to 72 UTF-8 bytes.</span></p>
       <label for="admin-reset-confirm"><span data-copy-ko="새 비밀번호 확인" data-copy-en="Confirm new password">Confirm new password</span></label>
-      <input id="admin-reset-confirm" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="72" required>
+      <input id="admin-reset-confirm" name="confirmPassword" type="password" autocomplete="new-password" minlength="4" maxlength="72" required>
       <button id="admin-reset-submit" type="submit" class="admin-recovery-primary"><span data-copy-ko="새 비밀번호 저장" data-copy-en="Save new password">Save new password</span></button>
     </form>
     <p id="admin-recovery-status" role="status" aria-live="polite" aria-atomic="true"></p>
@@ -1094,7 +1094,7 @@ resetForm.addEventListener('submit', async event => {
   if (busy) return;
   if (!recoveryAuth.currentUser || Date.now() >= verifiedUntil) { clearInputs(); resetForm.hidden = true; googleButton.hidden = false; message('본인 확인이 만료되었습니다. 다시 확인해 주세요.', 'Verification expired. Please verify again.', true); return; }
   const password = newPassword.value;
-  if (Array.from(password).length < 12 || new TextEncoder().encode(password).length > 72 || /[\u0000-\u001f\u007f]/u.test(password)) { message('비밀번호를 12자 이상, 72바이트 이하로 입력해 주세요.', 'Use at least 12 characters, up to 72 UTF-8 bytes.', true); newPassword.focus(); return; }
+  if (Array.from(password).length < 4 || new TextEncoder().encode(password).length > 72 || /[\u0000-\u001f\u007f]/u.test(password)) { message('비밀번호를 4자 이상, 72바이트 이하로 입력해 주세요.', 'Use at least 4 characters, up to 72 UTF-8 bytes.', true); newPassword.focus(); return; }
   if (password !== confirmPassword.value) { message('새 비밀번호 확인이 일치하지 않습니다.', 'The new passwords do not match.', true); confirmPassword.focus(); return; }
   setBusy(true); message('새 비밀번호를 저장 중입니다...', 'Saving your new password...');
   try {
