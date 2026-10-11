@@ -426,6 +426,7 @@ html{scroll-behavior:smooth;scroll-padding-top:110px}section[id]{scroll-margin-t
                     <button type="button" id="close-admin-modal" class="flex-1 py-3 text-sm font-bold text-outline hover:text-on-surface transition-colors"><span data-copy-ko="취소" data-copy-en="Cancel">Cancel</span></button>
                     <button type="submit" class="flex-1 bg-primary text-on-primary py-3 rounded-full font-bold text-sm"><span data-copy-ko="로그인" data-copy-en="Sign in">Sign in</span></button>
                 </div>
+                <button type="button" id="admin-forgot-password" class="block w-full pt-2 text-sm text-primary underline underline-offset-4"><span data-copy-ko="비밀번호를 잊으셨나요? 재설정" data-copy-en="Forgot your password? Reset it">Forgot your password? Reset it</span></button>
             </form>
         </div>
     </div>
@@ -661,7 +662,7 @@ if (!window.FORREST_PREVIEW) {
             let allData = [];
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                allData.push({ id: doc.id, ...data });
+                allData.push({ ...data, id: doc.id });
             });
             
             // Sort by descending date
@@ -681,67 +682,81 @@ if (!window.FORREST_PREVIEW) {
                 list.innerHTML = `<div class="text-center text-on-surface-variant p-8 bg-surface-container-low rounded-2xl">아직 남겨진 방명록이 없습니다. 첫 번째 이야기를 남겨주세요.</div>`;
                 return;
             }
-            guestbookData.forEach((data) => {
-                const audioHTML = data.audioUrl ? `
-                <div class="mt-4">
-                    <audio src="${data.audioUrl}" controls class="w-full h-10 outline-none rounded-full"></audio>
-                </div>` : '';
-
-                const replyHTML = data.reply ? `
-                <div class="mt-6 bg-surface-container-low p-4 rounded-xl border-l-4 border-primary">
-                    <p class="text-xs md:text-[10px] font-bold text-primary mb-2 uppercase tracking-widest">FOR.REST STAY 호스트의 답글</p>
-                    <p class="text-xs text-on-surface-variant leading-relaxed">${data.reply}</p>
-                </div>` : '';
-
+            guestbookData.forEach((data, renderIndex) => {
+                // Guest-written content is plain text, never executable markup.
+                const node = (tag, classes, text) => {
+                    const element = document.createElement(tag);
+                    if (classes) element.className = classes;
+                    if (text !== undefined && text !== null) element.textContent = String(text);
+                    return element;
+                };
+                const mediaURL = (value) => {
+                    if (typeof value !== 'string') return null;
+                    try {
+                        const parsed = new URL(value);
+                        return parsed.protocol === 'https:' && !parsed.username && !parsed.password ? parsed.href : null;
+                    } catch (_) { return null; }
+                };
                 let dateStr = '';
                 if (data.createdAt) {
-                    if (typeof data.createdAt.toDate === 'function') {
-                        dateStr = data.createdAt.toDate().toLocaleDateString();
-                    } else if (data.createdAt.seconds) {
-                        dateStr = new Date(data.createdAt.seconds * 1000).toLocaleDateString();
-                    } else {
-                        dateStr = new Date(data.createdAt).toLocaleDateString();
-                    }
-                } else {
-                    dateStr = new Date().toLocaleDateString(); // pending write
+                    if (typeof data.createdAt.toDate === 'function') dateStr = data.createdAt.toDate().toLocaleDateString();
+                    else if (data.createdAt.seconds) dateStr = new Date(data.createdAt.seconds * 1000).toLocaleDateString();
+                    else dateStr = new Date(data.createdAt).toLocaleDateString();
+                } else dateStr = new Date().toLocaleDateString();
+                const entryDiv = node('div', 'bg-white p-6 rounded-xl border border-stone-100 shadow-sm transition-all hover:shadow-md relative group');
+                const deleteArea = node('div', 'absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity');
+                if (isAdmin || data.password) {
+                    const deleteButton = node('button', 'text-error hover:bg-error-container p-1 rounded transition-colors');
+                    deleteButton.type = 'button';
+                    deleteButton.title = '기록 지우기';
+                    deleteButton.dataset.guestbookDelete = 'true';
+                    deleteButton.addEventListener('click', () => window.requestDelete(data.id));
+                    deleteButton.appendChild(node('span', 'material-symbols-outlined text-[18px]', 'delete'));
+                    deleteArea.appendChild(deleteButton);
                 }
-                
-                const entryId = 'qr-' + data.id;
-
-                const deleteBtnHtml = (isAdmin || data.password) ? `
-                    <button onclick="requestDelete('${data.id}')" class="text-error hover:bg-error-container p-1 rounded transition-colors" title="기록 지우기">
-                        <span class="material-symbols-outlined text-[18px]">delete</span>
-                    </button>
-                ` : '';
-
-                const entryDiv = document.createElement('div');
-                entryDiv.className = 'bg-white p-6 rounded-xl border border-stone-100 shadow-sm transition-all hover:shadow-md relative group';
-                entryDiv.innerHTML = `
-                <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    ${deleteBtnHtml}
-                </div>
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h4 class="font-bold text-primary">${data.name}</h4>
-                        <p class="text-xs md:text-[10px] text-outline uppercase tracking-wider">업로드 일자: ${dateStr}</p>
-                    </div>
-                    <div class="w-16 h-16 bg-white p-1 border border-outline-variant rounded flex items-center justify-center">
-                        <div id="${entryId}"></div>
-                    </div>
-                </div>
-                <p class="text-on-surface text-sm leading-relaxed mb-4 whitespace-pre-line">${data.message}</p>
-                ${data.photoUrls && data.photoUrls.length > 0 ? `<div class="grid grid-cols-2 gap-4 my-4">${data.photoUrls.map(url => `<img src="${url}" class="w-full aspect-square rounded-xl object-cover border border-stone-100">`).join('')}</div>` : ''}
-                ${audioHTML}
-                ${replyHTML}
-                `;
+                entryDiv.appendChild(deleteArea);
+                const header = node('div', 'flex justify-between items-start mb-4');
+                const textHeader = node('div');
+                textHeader.appendChild(node('h4', 'font-bold text-primary', data.name));
+                textHeader.appendChild(node('p', 'text-xs md:text-[10px] text-outline uppercase tracking-wider', '업로드 일자: ' + dateStr));
+                header.appendChild(textHeader);
+                const qrFrame = node('div', 'w-16 h-16 bg-white p-1 border border-outline-variant rounded flex items-center justify-center');
+                const qrContainer = node('div');
+                qrContainer.id = 'guestbook-qr-' + renderIndex;
+                qrFrame.appendChild(qrContainer);
+                header.appendChild(qrFrame);
+                entryDiv.appendChild(header);
+                entryDiv.appendChild(node('p', 'text-on-surface text-sm leading-relaxed mb-4 whitespace-pre-line', data.message));
+                const photoURLs = Array.isArray(data.photoUrls) ? data.photoUrls.map(mediaURL).filter(Boolean) : [];
+                if (photoURLs.length) {
+                    const photos = node('div', 'grid grid-cols-2 gap-4 my-4');
+                    photoURLs.forEach(url => {
+                        const image = node('img', 'w-full aspect-square rounded-xl object-cover border border-stone-100');
+                        image.src = url;
+                        image.referrerPolicy = 'no-referrer';
+                        photos.appendChild(image);
+                    });
+                    entryDiv.appendChild(photos);
+                }
+                const audioURL = mediaURL(data.audioUrl);
+                if (audioURL) {
+                    const audioArea = node('div', 'mt-4');
+                    const audio = node('audio', 'w-full h-10 outline-none rounded-full');
+                    audio.src = audioURL;
+                    audio.controls = true;
+                    audioArea.appendChild(audio);
+                    entryDiv.appendChild(audioArea);
+                }
+                if (data.reply) {
+                    const reply = node('div', 'mt-6 bg-surface-container-low p-4 rounded-xl border-l-4 border-primary');
+                    reply.appendChild(node('p', 'text-xs md:text-[10px] font-bold text-primary mb-2 uppercase tracking-widest', 'FOR.REST STAY 호스트의 답글'));
+                    reply.appendChild(node('p', 'text-xs text-on-surface-variant leading-relaxed', data.reply));
+                    entryDiv.appendChild(reply);
+                }
                 list.appendChild(entryDiv);
-
-                if (data.audioUrl) {
-                    try {
-                        new QRCode(entryDiv.querySelector('#' + entryId), {
-                            text: data.audioUrl, width: 54, height: 54, colorDark: "#234c29", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L
-                        });
-                    } catch(e) { console.error("QR Code error:", e); }
+                if (audioURL) {
+                    try { new QRCode(qrContainer, { text: audioURL, width: 54, height: 54, colorDark: '#234c29', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.L }); }
+                    catch (_) { console.error('Guestbook audio QR rendering failed.'); }
                 }
             });
         }
@@ -930,7 +945,7 @@ if (!window.FORREST_PREVIEW) {
         if (el.textContent !== value) el.textContent = value;
       }
     });
-    document.querySelectorAll('#guestbook-list button[onclick^="requestDelete("]').forEach(function (el) {
+    document.querySelectorAll('#guestbook-list button[data-guestbook-delete]').forEach(function (el) {
       var value = language === 'en' ? 'Delete this memory' : '기록 지우기';
       if (el.title !== value) el.title = value;
     });
@@ -976,4 +991,135 @@ if (!window.FORREST_PREVIEW) {
   }};
 })();
 </script>
+
+<!-- Owner-only recovery; isolated from guestbook authentication and content. -->
+<style id="homepage-admin-recovery-style">
+  .admin-recovery-dialog[hidden], .admin-recovery-dialog [hidden] { display: none !important; }
+  .admin-recovery-dialog { position: fixed; inset: 0; z-index: 110; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(12, 25, 17, .8); }
+  .admin-recovery-panel { width: min(100%, 440px); max-height: calc(100dvh - 40px); overflow: auto; padding: 28px; border-radius: 18px; background: #fffdf7; color: #233c29; box-shadow: 0 20px 70px #0004; }
+  .admin-recovery-panel h3 { font-size: 24px; margin: 0 0 12px; }
+  .admin-recovery-description, .admin-recovery-help { font-size: 14px; line-height: 1.7; color: #536257; }
+  .admin-recovery-panel button { width: 100%; padding: 12px 16px; margin-top: 16px; border-radius: 999px; font-size: 14px; cursor: pointer; }
+  .admin-recovery-primary { border: 1px solid #3e6842; background: #3e6842; color: white; }
+  .admin-recovery-secondary { border: 1px solid #c2c9be; background: transparent; color: #3e6842; }
+  .admin-recovery-panel button:disabled { opacity: .55; cursor: wait; }
+  .admin-recovery-panel label { display: block; font-size: 14px; margin: 18px 0 6px; }
+  .admin-recovery-panel input { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #b7c4b7; border-radius: 8px; background: white; color: #233c29; }
+  .admin-recovery-panel input:focus, .admin-recovery-panel button:focus-visible { outline: 3px solid #a4d2a4; outline-offset: 2px; }
+  #admin-recovery-status { margin-top: 16px; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+  #admin-recovery-status[data-error="true"] { color: #a12424; }
+  @media (max-width: 480px) { .admin-recovery-panel { padding: 22px; } }
+</style>
+<div id="admin-recovery-modal" class="admin-recovery-dialog" role="dialog" aria-modal="true" aria-labelledby="admin-recovery-title" aria-describedby="admin-recovery-description" hidden>
+  <div class="admin-recovery-panel">
+    <h3 id="admin-recovery-title"><span data-copy-ko="관리자 비밀번호 재설정" data-copy-en="Reset host password">Reset host password</span></h3>
+    <p id="admin-recovery-description" class="admin-recovery-description"><span data-copy-ko="등록된 관리자 Google 계정으로 본인 확인한 후 새 비밀번호를 설정하세요. Google 계정 비밀번호는 변경되지 않습니다." data-copy-en="Verify your registered host Google account, then set a new website password. Your Google password will not change.">Verify your registered host Google account, then set a new website password. Your Google password will not change.</span></p>
+    <button id="admin-recovery-google" type="button" class="admin-recovery-primary" disabled><span data-copy-ko="Google 계정으로 본인 확인" data-copy-en="Verify with Google">Verify with Google</span></button>
+    <form id="admin-reset-form" hidden>
+      <label for="admin-reset-password"><span data-copy-ko="새 관리자 비밀번호" data-copy-en="New host password">New host password</span></label>
+      <input id="admin-reset-password" name="newPassword" type="password" autocomplete="new-password" minlength="12" maxlength="72" required aria-describedby="admin-reset-password-help">
+      <p id="admin-reset-password-help" class="admin-recovery-help"><span data-copy-ko="12자 이상으로 설정해 주세요. 최대 72바이트이며 한글은 글자당 보통 3바이트입니다." data-copy-en="Use at least 12 characters, up to 72 UTF-8 bytes.">Use at least 12 characters, up to 72 UTF-8 bytes.</span></p>
+      <label for="admin-reset-confirm"><span data-copy-ko="새 비밀번호 확인" data-copy-en="Confirm new password">Confirm new password</span></label>
+      <input id="admin-reset-confirm" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="72" required>
+      <button id="admin-reset-submit" type="submit" class="admin-recovery-primary"><span data-copy-ko="새 비밀번호 저장" data-copy-en="Save new password">Save new password</span></button>
+    </form>
+    <p id="admin-recovery-status" role="status" aria-live="polite" aria-atomic="true"></p>
+    <button id="admin-recovery-back" type="button" class="admin-recovery-primary" hidden><span data-copy-ko="로그인 창으로 돌아가기" data-copy-en="Back to sign in">Back to sign in</span></button>
+    <button id="admin-recovery-close" type="button" class="admin-recovery-secondary"><span data-copy-ko="취소" data-copy-en="Cancel">Cancel</span></button>
+  </div>
+</div>
+<script type="module" id="homepage-admin-recovery-module">
+import { getApp, getApps, initializeApp } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, setPersistence, inMemoryPersistence, signOut } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-functions.js';
+const originalApp = getApp();
+const recoveryApp = getApps().find(app => app.name === 'homepage-admin-recovery') || initializeApp(originalApp.options, 'homepage-admin-recovery');
+const recoveryAuth = getAuth(recoveryApp);
+const recoveryCall = httpsCallable(getFunctions(recoveryApp, 'us-central1'), 'forestResetHomepageAdminPassword', { timeout: 45000 });
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: 'select_account' });
+const modal = document.getElementById('admin-recovery-modal');
+const loginModal = document.getElementById('admin-login-modal');
+const forgot = document.getElementById('admin-forgot-password');
+const googleButton = document.getElementById('admin-recovery-google');
+const resetForm = document.getElementById('admin-reset-form');
+const newPassword = document.getElementById('admin-reset-password');
+const confirmPassword = document.getElementById('admin-reset-confirm');
+const submitButton = document.getElementById('admin-reset-submit');
+const closeButton = document.getElementById('admin-recovery-close');
+const backButton = document.getElementById('admin-recovery-back');
+const status = document.getElementById('admin-recovery-status');
+let authReady = false;
+let busy = false;
+let verifiedUntil = 0;
+let returnFocus = null;
+const copy = (ko, en) => (window.forrestSiteLanguage?.get() || document.documentElement.lang) === 'ko' ? ko : en;
+function message(ko, en, error = false) { status.textContent = copy(ko, en); status.dataset.error = String(error); }
+function setBusy(value) { busy = value; googleButton.disabled = value || !authReady; submitButton.disabled = value; closeButton.disabled = value; backButton.disabled = value; }
+function clearInputs() { newPassword.value = ''; confirmPassword.value = ''; verifiedUntil = 0; }
+function hideLogin() { loginModal.classList.add('opacity-0', 'pointer-events-none'); }
+function showLogin() { modal.hidden = true; clearInputs(); loginModal.classList.remove('opacity-0', 'pointer-events-none'); document.getElementById('admin-password').focus(); }
+async function closeRecovery() { if (busy) return; modal.hidden = true; clearInputs(); await signOut(recoveryAuth).catch(() => {}); if (returnFocus) returnFocus.focus(); }
+function showError(error) {
+  const code = error?.code || '';
+  if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') message('본인 확인을 취소했습니다. 다시 시도할 수 있습니다.', 'Verification was cancelled. You can try again.', true);
+  else if (code === 'auth/popup-blocked') message('팝업이 차단되었습니다. 이 홈페이지의 팝업을 허용한 후 다시 눌러 주세요.', 'Allow pop-ups for this website, then try again.', true);
+  else if (code === 'functions/permission-denied') message('등록된 관리자 Google 계정으로 다시 본인 확인해 주세요.', 'Please verify with the registered host Google account.', true);
+  else if (code === 'functions/failed-precondition' || code === 'functions/unauthenticated') message('본인 확인이 만료되었거나 이미 사용되었습니다. 다시 확인해 주세요.', 'Verification expired or was already used. Please verify again.', true);
+  else if (code === 'functions/resource-exhausted') message('재설정 요청이 너무 많습니다. 잠시 기다린 후 다시 시도해 주세요.', 'Too many reset requests. Please wait before trying again.', true);
+  else if (code === 'functions/deadline-exceeded' || code === 'functions/unavailable') message('응답을 확인하지 못했습니다. 저장을 눌렀다면 입력한 새 비밀번호로 로그인을 먼저 시도해 주세요.', 'The result could not be confirmed. If you pressed Save, try signing in with your new password first.', true);
+  else message('요청을 완료하지 못했습니다. 네트워크를 확인한 후 다시 시도해 주세요.', 'Could not complete the request. Check your connection and try again.', true);
+}
+setPersistence(recoveryAuth, inMemoryPersistence).then(() => { authReady = true; googleButton.disabled = busy; }).catch(() => message('본인 확인을 준비하지 못했습니다. 새로고침 후 다시 시도해 주세요.', 'Could not prepare verification. Refresh and try again.', true));
+forgot.addEventListener('click', () => {
+  returnFocus = forgot;
+  hideLogin(); clearInputs(); resetForm.hidden = true; backButton.hidden = true; googleButton.hidden = false; status.textContent = ''; status.dataset.error = 'false'; modal.hidden = false; googleButton.focus();
+});
+googleButton.addEventListener('click', async () => {
+  if (busy || !authReady) return;
+  setBusy(true); clearInputs(); resetForm.hidden = true;
+  message('Google 계정으로 본인 확인 중입니다...', 'Verifying your Google account...');
+  try {
+    await signInWithPopup(recoveryAuth, provider);
+    const result = await recoveryCall({ action: 'verify' });
+    if (result.data?.verified !== true || !Number.isFinite(result.data.expiresAtMs)) throw new Error('Verification not accepted');
+    verifiedUntil = result.data.expiresAtMs; googleButton.hidden = true; resetForm.hidden = false;
+    message('관리자 본인 확인을 완료했습니다. 새 비밀번호를 입력해 주세요.', 'Host verified. Enter your new password.');
+    newPassword.focus();
+  } catch (error) { await signOut(recoveryAuth).catch(() => {}); showError(error); }
+  finally { setBusy(false); }
+});
+resetForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  if (busy) return;
+  if (!recoveryAuth.currentUser || Date.now() >= verifiedUntil) { clearInputs(); resetForm.hidden = true; googleButton.hidden = false; message('본인 확인이 만료되었습니다. 다시 확인해 주세요.', 'Verification expired. Please verify again.', true); return; }
+  const password = newPassword.value;
+  if (Array.from(password).length < 12 || new TextEncoder().encode(password).length > 72 || /[\u0000-\u001f\u007f]/u.test(password)) { message('비밀번호를 12자 이상, 72바이트 이하로 입력해 주세요.', 'Use at least 12 characters, up to 72 UTF-8 bytes.', true); newPassword.focus(); return; }
+  if (password !== confirmPassword.value) { message('새 비밀번호 확인이 일치하지 않습니다.', 'The new passwords do not match.', true); confirmPassword.focus(); return; }
+  setBusy(true); message('새 비밀번호를 저장 중입니다...', 'Saving your new password...');
+  try {
+    const result = await recoveryCall({ action: 'reset', newPassword: password, confirmPassword: confirmPassword.value });
+    if (result.data?.success !== true) throw new Error('Reset not accepted');
+    clearInputs(); document.getElementById('admin-password').value = ''; resetForm.hidden = true; googleButton.hidden = true; backButton.hidden = false;
+    await Promise.allSettled([signOut(recoveryAuth), signOut(getAuth(originalApp))]);
+    if (result.data.refreshSessionsRevoked === false) message('새 비밀번호를 저장했습니다. 새 비밀번호로 로그인하세요. 기존 로그인 기기에서는 직접 로그아웃해 주세요.', 'Your new password was saved. Sign in with it, and sign out on other devices.');
+    else message('새 비밀번호를 저장했습니다. 새 비밀번호로 다시 로그인해 주세요.', 'Your new password was saved. Please sign in again.');
+    backButton.focus();
+  } catch (error) {
+    showError(error);
+    if (['functions/failed-precondition', 'functions/unauthenticated'].includes(error?.code)) { clearInputs(); resetForm.hidden = true; googleButton.hidden = false; }
+  } finally { setBusy(false); }
+});
+backButton.addEventListener('click', showLogin);
+closeButton.addEventListener('click', () => { closeRecovery().then(() => { loginModal.classList.remove('opacity-0', 'pointer-events-none'); forgot.focus(); }); });
+modal.addEventListener('keydown', event => {
+  if (event.key === 'Escape') { event.preventDefault(); if (!busy) closeButton.click(); return; }
+  if (event.key !== 'Tab') return;
+  const controls = [...modal.querySelectorAll('button:not(:disabled), input:not(:disabled)')].filter(element => !element.hidden && element.getClientRects().length);
+  const first = controls[0], last = controls[controls.length - 1];
+  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+});
+</script>
+
 </body></html>
