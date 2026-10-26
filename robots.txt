@@ -1,0 +1,13 @@
+User-agent: Googlebot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: *
+Disallow:
+
+Sitemap: https://forreststay.com/sitemap.xml
